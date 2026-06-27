@@ -1,0 +1,28 @@
+type Query {
+    getMyNotifications: [Notification]
+    getUnreadNotifications: [Notification]
+    getUnreadNotificationCount: Int
+}
+
+type Mutation {
+    markNotificationAsRead(id: ID!): Notification
+    markAllNotificationsAsRead: Boolean
+}
+
+type Subscription {
+    bookPublished: Notification
+    bookIssued: Notification
+    dueDateReminder: Notification
+    reservationAvailable: Notification
+    notificationsByType(type: String!): Notification
+}
+
+type Notification {
+    id: ID
+    type: String
+    message: String
+    userId: ID
+    relatedEntityId: ID
+    read: Boolean
+    createdAt: String
+}

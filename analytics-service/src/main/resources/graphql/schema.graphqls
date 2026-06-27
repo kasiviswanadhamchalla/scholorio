@@ -1,0 +1,49 @@
+scalar JSON
+
+type Query {
+    getBookUsageAnalytics(bookId: ID!): BookUsageAnalytics
+    getCourseMaterialStats(courseId: ID!): CourseMaterialStats
+    getFacultyPerformance(facultyId: ID!): FacultyPerformance
+    getStudentEngagement(studentId: ID!): StudentEngagement
+    getLibrarianStats: LibrarianStats
+}
+
+type LibrarianStats {
+    activeIssues: Int!
+    overdueIssues: Int!
+    returnedToday: Int!
+    activeReservations: Int!
+}
+
+type BookUsageAnalytics {
+    bookId: ID!
+    title: String!
+    totalIssues: Int!
+    totalReservations: Int!
+    digitalAccessCount: Int!
+}
+
+type CourseMaterialStats {
+    courseId: ID!
+    courseCode: String!
+    totalMaterials: Int!
+    mandatoryCount: Int!
+    optionalCount: Int!
+    averageUsageRate: Float!
+}
+
+type FacultyPerformance {
+    facultyId: ID!
+    facultyName: String!
+    booksAuthored: Int!
+    coursesTaught: Int!
+    totalStudentEngagement: Int!
+}
+
+type StudentEngagement {
+    studentId: ID!
+    studentName: String!
+    booksBorrowed: Int!
+    digitalContentAccessed: Int!
+    activeReservations: Int!
+}

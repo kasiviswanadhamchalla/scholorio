@@ -1,0 +1,40 @@
+scalar JSON
+
+type Query {
+    getRoyaltyDetails(bookId: ID!): [RoyaltyRecord]
+    getRevenueByBook(bookId: ID!): Float
+}
+
+type Mutation {
+    defineRoyaltyPolicy(input: RoyaltyPolicyInput!): RoyaltyPolicy
+    calculateRoyalty(bookId: ID!, totalRevenue: Float!): RoyaltyRecord
+    distributeRoyalty(recordId: ID!): RoyaltyRecord
+}
+
+type RoyaltyPolicy {
+    id: ID
+    bookId: ID
+    facultyId: ID
+    royaltyPercentage: Float
+    sharingModel: JSON
+    createdAt: String
+    updatedAt: String
+}
+
+type RoyaltyRecord {
+    id: ID
+    bookId: ID
+    facultyId: ID
+    totalRevenue: Float
+    calculatedRoyalty: Float
+    payoutStatus: String
+    calculatedAt: String
+    distributedAt: String
+}
+
+input RoyaltyPolicyInput {
+    bookId: ID!
+    facultyId: ID!
+    royaltyPercentage: Float!
+    sharingModel: JSON
+}

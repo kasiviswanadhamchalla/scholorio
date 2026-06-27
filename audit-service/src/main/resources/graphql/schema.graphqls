@@ -1,0 +1,30 @@
+type Query {
+    detectUnauthorizedAccess: [ViolationReport]
+    analyzeUsagePatterns: [ViolationReport]
+    getViolationReports(username: String): [ViolationReport]
+}
+
+type ViolationReport {
+    id: ID!
+    username: String!
+    type: ViolationType!
+    severity: ViolationSeverity!
+    description: String!
+    detectedAt: String!
+    resolved: Boolean!
+}
+
+enum ViolationType {
+    UNAUTHORIZED_ACCESS
+    EXCESSIVE_DOWNLOADS
+    SUSPICIOUS_SHARING
+    ACCESS_ABUSE
+    EXCESSIVE_USAGE
+}
+
+enum ViolationSeverity {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}

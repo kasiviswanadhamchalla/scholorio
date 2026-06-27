@@ -1,0 +1,26 @@
+type Query {
+    recommendBooks: [BookRecommendation]
+    suggestCourseMaterials(courseId: ID!): [CourseMaterialSuggestion]
+    predictDemand: [DemandPrediction]
+}
+
+type BookRecommendation {
+    bookId: ID!
+    title: String!
+    recommendationReason: String!
+    confidenceScore: Float!
+}
+
+type CourseMaterialSuggestion {
+    bookId: ID!
+    title: String!
+    courseContext: String!
+    suggestionReason: String!
+}
+
+type DemandPrediction {
+    bookId: ID!
+    title: String!
+    predictedDemandCount: Int!
+    riskLevel: String!
+}

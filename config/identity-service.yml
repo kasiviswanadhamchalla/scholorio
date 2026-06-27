@@ -1,0 +1,29 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/scholario_identity?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: scholario
+    password: Scholario@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: true
+
+  graphql:
+    path: /graphql
+    schema:
+      locations: "classpath*:graphql/**/"
+
+auth:
+  jwt:
+    secret: "scholario-secret-key-2026-very-secure"
+    access-token-expiration-ms: 3600000
+    refresh-token-expiration-ms: 604800000

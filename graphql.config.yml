@@ -1,0 +1,24 @@
+schema:
+  - "identity-service/src/main/resources/graphql/schema.graphqls"
+  - "book-service/src/main/resources/graphql/schema.graphqls"
+  - "lending-service/src/main/resources/graphql/schema.graphqls"
+  - "reservation-service/src/main/resources/graphql/schema.graphqls"
+  - "approval-service/src/main/resources/graphql/schema.graphqls"
+  - "course-service/src/main/resources/graphql/schema.graphqls"
+  - "digital-content-service/src/main/resources/graphql/schema.graphqls"
+  - "royalty-service/src/main/resources/graphql/schema.graphqls"
+  - "notification-service/src/main/resources/graphql/schema.graphqls"
+  - "analytics-service/src/main/resources/graphql/schema.graphqls"
+  - "search-service/src/main/resources/graphql/schema.graphqls"
+  - "audit-service/src/main/resources/graphql/schema.graphqls"
+
+documents:
+  - "**/*.graphql"
+  - "scholario-graphiql-operations.md"
+
+extensions:
+  endpoints:
+    Default:
+      url: "http://localhost:8090/graphql"
+      headers:
+        Authorization: "Bearer ${token}"
