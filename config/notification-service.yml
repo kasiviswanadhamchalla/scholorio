@@ -1,5 +1,5 @@
 server:
-  port: 8089
+  port: 8084
 
 spring:
   datasource:
@@ -16,13 +16,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
     show-sql: true
-
-  graphql:
-    path: /graphql
-    schema:
-      locations: "classpath*:graphql/**/"
-
-  security:
+security:
     oauth2:
       resourceserver:
         jwt:

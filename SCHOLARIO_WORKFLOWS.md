@@ -1,373 +1,155 @@
-# Scholario End-to-End Role-Based Workflows
+# Scholario REST API End-to-End Workflows & Dummy Data Examples
 
-This document outlines the step-by-step workflows for each roles. All GraphQL operations have been expanded to select **all available fields** and use **hardcoded values** for direct use in Postman or GraphiQL without variables.
-
----
-
-## 🟢 1. Admin Workflow (System Setup)
-
-### [1.1] Register Admin Account
-```graphql
-mutation {
-  registerUser(input: {
-    username: "admin_user",
-    password: "AdminPassword123!",
-    email: "admin@scholario.edu",
-    fullName: "System Administrator"
-  }) {
-    id
-    username
-    email
-    fullName
-    roles
-    department { id name code }
-    createdAt
-    updatedAt
-  }
-}
-```
-
-### [1.2] Login
-```graphql
-mutation {
-  login(input: {
-    username: "admin_user",
-    password: "AdminPassword123!"
-  }) {
-    accessToken
-    refreshToken
-    tokenType
-    expiresIn
-    user {
-      id
-      username
-      email
-      fullName
-      roles
-      department { id name code }
-      createdAt
-      updatedAt
-    }
-  }
-}
-```
-
-### [1.3] Setup Departments
-```graphql
-mutation {
-  createDepartment(input: {
-    name: "Computer Science",
-    code: "CS"
-  }) {
-    id
-    name
-    code
-  }
-}
-```
-
-### [1.4] Monitor Security (Violations)
-```graphql
-query {
-  getViolationReports {
-    id
-    username
-    type
-    severity
-    description
-    timestamp
-  }
-}
-```
+This document outlines the workflows and contains realistic copy-pasteable dummy data payloads to test the Spring Boot REST API endpoints.
 
 ---
 
-## 🔵 2. Faculty Workflow (Content & Course Management)
+## 🟢 1. Super Admin Workflow (System Setup & Auditing)
 
-### [2.1] Author a Book (Draft)
-```graphql
-mutation {
-  createBook(input: {
-    title: "Modern Java Development",
-    isbn: "978-3-16-148410-0",
-    description: "A comprehensive guide to Java 21+",
-    facultyId: "2"
-  }) {
-    id
-    title
-    isbn
-    description
-    facultyId
-    versionNumber
-    parentBookId
-    createdAt
-    updatedAt
-    state {
-      type
-    }
-  }
+### [1.1] Create Departments
+* **Request:** `POST /api/member/departments`
+* **Headers:** `Authorization: Bearer <SUPER_ADMIN_JWT>`
+* **Payload:**
+```json
+{
+  "name": "Computer Science & Engineering",
+  "code": "CSE"
 }
 ```
 
-### [2.2] Submit for Review
-```graphql
-mutation {
-  submitBookForReview(bookId: "1", reviewerId: "3") {
-    id
-    bookId
-    reviewerId
-    status
-    feedback
-    createdAt
-    updatedAt
-  }
+* **Another Department Payload:**
+```json
+{
+  "name": "Electrical & Electronics Engineering",
+  "code": "EEE"
 }
 ```
 
-### [2.3] Manage Digital Assets
-```graphql
-mutation {
-  uploadDigitalContent(input: {
-    bookId: "1",
-    contentType: "PDF",
-    contentUrl: "https://assets.scholario.edu/books/java-modern.pdf",
-    drmEnforced: true
-  }) {
-    id
-    bookId
-    contentType
-    contentUrl
-    drmEnforced
-    createdAt
-    updatedAt
-  }
+### [1.2] Assign Roles to Users
+* **Request:** `POST /api/member/users/2/assign-role?role=LIBRARIAN`
+* **Headers:** `Authorization: Bearer <SUPER_ADMIN_JWT>`
+
+* **Another Assign Request:**
+* **Request:** `POST /api/member/users/3/assign-role?role=MEMBER`
+* **Headers:** `Authorization: Bearer <SUPER_ADMIN_JWT>`
+
+### [1.3] Link Member to Department
+* **Request:** `POST /api/member/users/3/link-department?departmentId=1`
+* **Headers:** `Authorization: Bearer <SUPER_ADMIN_JWT>`
+
+---
+
+## 🔵 2. Librarian & Assistant Librarian Workflow (Circulation & Approvals)
+
+### [2.1] Catalog a New Book (Draft)
+* **Request:** `POST /api/catalog`
+* **Headers:** `Authorization: Bearer <LIBRARIAN_JWT>`
+* **Payload:**
+```json
+{
+  "title": "Introduction to Algorithms, Fourth Edition",
+  "isbn": "978-0262046305",
+  "description": "The classic guide to computer algorithms, fully updated.",
+  "facultyId": 3
 }
 ```
 
-### [2.4] Course Setup & Material Assignment
-```graphql
-mutation {
-  createCourse(input: {
-    courseCode: "CS101",
-    title: "Introduction to Programming",
-    description: "Learn the basics of coding with Java",
-    facultyId: "2"
-  }) {
-    id
-    courseCode
-    title
-    description
-    facultyId
-    createdAt
-    updatedAt
-  }
-}
+### [2.2] Submit Book for Review
+* **Request:** `POST /api/catalog/1/submit-review`
+* **Headers:** `Authorization: Bearer <LIBRARIAN_JWT>`
 
-mutation {
-  assignBookToCourse(input: {
-    courseId: "1",
-    bookId: "1",
-    mandatory: true
-  }) {
-    id
-    courseId
-    bookId
-    mandatory
-    createdAt
-    updatedAt
-  }
+### [2.3] Retrieve Pending Approval Queue
+* **Request:** `GET /api/lending/queue`
+* **Headers:** `Authorization: Bearer <LIBRARIAN_JWT>`
+
+### [2.4] Approve Lending Request (Level 1 / Level 2)
+* **Request:** `POST /api/lending/1/approve`
+* **Headers:** `Authorization: Bearer <LIBRARIAN_JWT>`
+
+### [2.5] Reject Lending Request with Reason
+* **Request:** `POST /api/lending/1/reject`
+* **Headers:** `Authorization: Bearer <LIBRARIAN_JWT>`
+* **Payload:**
+```json
+{
+  "reason": "This book is currently reserved for course reference only."
 }
 ```
 
-### [2.5] Track Royalties & Analytics
-```graphql
-mutation {
-  defineRoyaltyPolicy(input: {
-    bookId: "1",
-    royaltyPercentage: 15.5
-  }) {
-    id
-    bookId
-    royaltyPercentage
-    effectiveFrom
-    createdAt
-  }
-}
+### [2.6] Publish Catalog Book
+* **Request:** `POST /api/catalog/1/publish`
+* **Headers:** `Authorization: Bearer <LIBRARIAN_JWT>`
 
-mutation {
-  calculateRoyalty(bookId: "1", totalRevenue: 10000.0) {
-    id
-    bookId
-    calculatedRoyalty
-    calculationDate
-    payoutStatus
-    revenuePeriodStart
-    revenuePeriodEnd
-  }
-}
+---
 
-query {
-  getBookUsageAnalytics(bookId: "1") {
-    bookId
-    title
-    totalIssues
-    totalReservations
-    digitalAccessCount
-    lastAccessedAt
-  }
+## 🟣 3. Member Workflow (Search, Lending, & Reservations)
+
+### [3.1] Discover Books in Catalog
+* **Request:** `GET /api/catalog?title=Algorithms`
+* **Headers:** `Authorization: Bearer <MEMBER_JWT>`
+
+### [3.2] Submit Lending Request
+* **Request:** `POST /api/lending/request`
+* **Headers:** `Authorization: Bearer <MEMBER_JWT>`
+* **Payload:**
+```json
+{
+  "bookId": 1
+}
+```
+
+### [3.3] View Personal Borrowed Books
+* **Request:** `GET /api/lending/my-issued`
+* **Headers:** `Authorization: Bearer <MEMBER_JWT>`
+
+### [3.4] Renew Lending Period
+* **Request:** `POST /api/lending/renew`
+* **Headers:** `Authorization: Bearer <MEMBER_JWT>`
+* **Payload:**
+```json
+{
+  "issueId": 1
 }
 ```
 
 ---
 
-## 🟠 3. Reviewer Workflow (Quality Control)
+## 🟡 4. Course & Digital Content Management Workflow
 
-### [3.1] View Review History
-```graphql
-query {
-  getReviewHistory(bookId: "1") {
-    id
-    reviewRecordId
-    status
-    feedback
-    performedBy
-    timestamp
-  }
+### [4.1] Create Course
+* **Request:** `POST /api/courses`
+* **Headers:** `Authorization: Bearer <FACULTY_JWT>`
+* **Payload:**
+```json
+{
+  "courseCode": "CS-301",
+  "title": "Design and Analysis of Algorithms",
+  "description": "An advanced study of design paradigms and complexity analysis.",
+  "facultyId": 3
 }
 ```
 
-### [3.2] Approve Book
-```graphql
-mutation {
-  approveBook(requestId: "1", feedback: "The content is accurate and well-structured. Highly recommended for students.") {
-    id
-    bookId
-    reviewerId
-    status
-    feedback
-    createdAt
-    updatedAt
-  }
+### [4.2] Assign Published Book to Course
+* **Request:** `POST /api/courses/materials`
+* **Headers:** `Authorization: Bearer <FACULTY_JWT>`
+* **Payload:**
+```json
+{
+  "courseId": 1,
+  "bookId": 1,
+  "mandatory": true
 }
 ```
 
----
-
-## 🟣 4. Student Workflow (Learning & Library)
-
-### [4.1] Discovery & Recommendations
-```graphql
-query {
-  searchBooks(title: "Java") {
-    id
-    title
-    isbn
-    description
-    state { type }
-    createdAt
-  }
-}
-
-query {
-  recommendBooks(userId: "4") {
-    bookId
-    title
-    recommendationReason
-    confidenceScore
-  }
-}
-```
-
-### [4.2] Physical Library (Lending & Reservations)
-```graphql
-mutation {
-  issueBook(input: {
-    bookId: "1",
-    userId: "4"
-  }) {
-    id
-    bookId
-    userId
-    issueDate
-    dueDate
-    renewalCount
-    penaltyAmount
-    state {
-      type
-      ... on Issued { issuedAt returnBy }
-      ... on Overdue { overdueSince penaltyAmount }
-    }
-  }
-}
-
-mutation {
-  reserveBook(input: {
-    bookId: "2",
-    userId: "4"
-  }) {
-    id
-    bookId
-    userId
-    reservedAt
-    expiresAt
-    status
-  }
-}
-```
-
-### [4.3] Access Digital Content
-```graphql
-query {
-  getDigitalContent(id: "1") {
-    id
-    bookId
-    contentType
-    contentUrl
-    drmEnforced
-  }
-}
-
-query {
-  suggestCourseMaterials(courseId: "1") {
-    bookId
-    title
-    courseTitle
-    suggestionReason
-  }
-}
-```
-
-### [4.4] Notifications
-```graphql
-query {
-  getNotificationsByUser(userId: "4") {
-    id
-    type
-    message
-    userId
-    relatedEntityId
-    read
-    createdAt
-  }
-}
-```
-
----
-
-## 🟡 5. Real-Time Subscriptions
-*Note: Subscriptions typically require a WebSocket connection.*
-
-### [5.1] Watch for New Publications
-```graphql
-subscription {
-  bookPublished {
-    id
-    type
-    message
-    userId
-    relatedEntityId
-    read
-    createdAt
-  }
+### [4.3] Upload Digital Content (DRM Enforced)
+* **Request:** `POST /api/content/upload`
+* **Headers:** `Authorization: Bearer <FACULTY_JWT>`
+* **Payload:**
+```json
+{
+  "bookId": 1,
+  "contentType": "PDF",
+  "contentUrl": "https://assets.scholario.edu/ebooks/algorithms-4e.pdf",
+  "drmEnforced": true
 }
 ```

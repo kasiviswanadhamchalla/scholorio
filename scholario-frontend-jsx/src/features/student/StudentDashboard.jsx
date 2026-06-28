@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useLazyQuery } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Grid, 
@@ -22,34 +23,13 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import HistoryIcon from '@mui/icons-material/History';
 import SearchIcon from '@mui/icons-material/Search';
 
-const GET_MY_ISSUES = gql`
-  query GetMyIssues {
-    getMyIssuedBooks {
-      id
-      bookId
-      issueDate
-      dueDate
-      state {
-        type
-      }
-      penaltyAmount
-    }
-  }
-`;
 
-const SEARCH_BOOKS = gql`
-  query SearchBooks($title: String) {
-    searchBooks(title: $title) {
-      id
-      title
-      isbn
-    }
-  }
-`;
+
+
 
 export const StudentDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data, loading, error } = useQuery(GET_MY_ISSUES);
+  const { data, loading, error } = useRestQuery('/api/lending/my-issued', 'getMyIssuedBooks');
   
   const [searchBooks, { data: searchData, loading: searching }] = useLazyQuery(SEARCH_BOOKS);
 

@@ -1,9 +1,9 @@
 package com.scholario.book.model;
 
 public enum Role {
-    ADMIN,
-    FACULTY,
-    STUDENT,
+    SUPER_ADMIN,
     LIBRARIAN,
+    ASSISTANT_LIBRARIAN,
+    MEMBER,
     UNASSIGNED
 }

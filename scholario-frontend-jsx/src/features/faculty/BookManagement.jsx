@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -33,77 +34,19 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const GET_MY_PROFILE = gql`
-  query GetMyProfile {
-    getMyProfile {
-      id
-      fullName
-    }
-  }
-`;
 
-const GET_BOOKS_BY_FACULTY = gql`
-  query GetBooksByFaculty($facultyId: ID!) {
-    getBooksByFaculty(facultyId: $facultyId) {
-      id
-      title
-      isbn
-      state {
-        type
-      }
-      createdAt
-    }
-  }
-`;
 
-const GET_FACULTY_LIST = gql`
-  query GetFacultyList {
-    getFacultyList {
-      id
-      fullName
-      username
-    }
-  }
-`;
 
-const SUBMIT_FOR_REVIEW = gql`
-  mutation SubmitForReview($bookId: ID!, $reviewerId: ID) {
-    submitBookForReview(bookId: $bookId, reviewerId: $reviewerId) {
-      id
-      status
-    }
-  }
-`;
 
-const PUBLISH_BOOK = gql`
-  mutation PublishBook($id: ID!) {
-    publishBook(id: $id) {
-      id
-      state {
-        type
-      }
-    }
-  }
-`;
 
-const CREATE_BOOK = gql`
-  mutation CreateBook($input: BookInput!) {
-    createBook(input: $input) {
-      id
-      title
-      isbn
-    }
-  }
-`;
 
-const GET_DEPARTMENTS = gql`
-  query GetDepartments {
-    getDepartments {
-      id
-      name
-    }
-  }
-`;
+
+
+
+
+
+
+
 
 export const BookManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -123,20 +66,20 @@ export const BookManagement = () => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [activeMenuBook, setActiveMenuBook] = useState(null);
 
-  const { data: profileData } = useQuery(GET_MY_PROFILE);
+  const { data: profileData } = useRestQuery('/api/member/profile', 'getMyProfile');
   const facultyId = profileData?.getMyProfile?.id;
 
-  const { data: booksData, loading: booksLoading, refetch: refetchBooks } = useQuery(GET_BOOKS_BY_FACULTY, {
+  const { data: booksData, loading: booksLoading, refetch: refetchBooks } = useRestQuery('/api/catalog', 'getBooksByFaculty', {
     variables: { facultyId },
     skip: !facultyId
   });
 
-  const { data: facultyListData } = useQuery(GET_FACULTY_LIST);
-  const { data: deptData, loading: deptLoading } = useQuery(GET_DEPARTMENTS);
+  const { data: facultyListData } = useRestQuery('/api/member/users', 'getFacultyList');
+  const { data: deptData, loading: deptLoading } = useRestQuery('/api/member/departments', 'getDepartments');
 
-  const [submitForReview] = useMutation(SUBMIT_FOR_REVIEW);
-  const [publishBook] = useMutation(PUBLISH_BOOK);
-  const [createBook] = useMutation(CREATE_BOOK);
+  const [submitForReview] = useRestMutation((v) => `/api/catalog/${v.bookId}/submit-review`, 'POST', 'submitBookForReview');
+  const [publishBook] = useRestMutation((v) => `/api/catalog/${v.id}/publish`, 'POST', 'publishBook');
+  const [createBook] = useRestMutation('/api/catalog', 'POST', 'createBook');
 
   const handleReviewSubmit = async () => {
     if (!selectedBook || !selectedReviewer) return;

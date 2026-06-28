@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -22,55 +23,15 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const GET_MY_PROFILE = gql`
-  query GetMyProfile {
-    getMyProfile {
-      id
-      fullName
-    }
-  }
-`;
 
-const GET_COURSES_BY_FACULTY = gql`
-  query GetCoursesByFaculty($facultyId: ID!) {
-    getCoursesByFaculty(facultyId: $facultyId) {
-      id
-      courseCode
-      title
-      description
-    }
-  }
-`;
 
-const GET_ALL_BOOKS = gql`
-  query GetAllBooks {
-    getAllBooks {
-      id
-      title
-      isbn
-    }
-  }
-`;
 
-const CREATE_COURSE = gql`
-  mutation CreateCourse($input: CourseInput!) {
-    createCourse(input: $input) {
-      id
-      courseCode
-      title
-    }
-  }
-`;
 
-const ASSIGN_BOOK_TO_COURSE = gql`
-  mutation AssignBookToCourse($input: CourseMaterialInput!) {
-    assignBookToCourse(input: $input) {
-      id
-      bookId
-      courseId
-    }
-  }
-`;
+
+
+
+
+
 
 export const CourseManagement = () => {
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
@@ -85,18 +46,18 @@ export const CourseManagement = () => {
   // Form states for assigning book
   const [selectedBookId, setSelectedBookId] = useState('');
 
-  const { data: profileData } = useQuery(GET_MY_PROFILE);
+  const { data: profileData } = useRestQuery('/api/member/profile', 'getMyProfile');
   const facultyId = profileData?.getMyProfile?.id;
 
-  const { data: coursesData, loading: coursesLoading, refetch: refetchCourses } = useQuery(GET_COURSES_BY_FACULTY, {
+  const { data: coursesData, loading: coursesLoading, refetch: refetchCourses } = useRestQuery('/api/member/dashboard', 'getCoursesByFaculty', {
     variables: { facultyId },
     skip: !facultyId
   });
 
-  const { data: booksData } = useQuery(GET_ALL_BOOKS);
+  const { data: booksData } = useRestQuery('/api/catalog', 'getAllBooks');
 
-  const [createCourse] = useMutation(CREATE_COURSE);
-  const [assignBook] = useMutation(ASSIGN_BOOK_TO_COURSE);
+  const [createCourse] = useRestMutation('/api/member/dashboard', 'POST', 'createCourse');
+  const [assignBook] = useRestMutation('/api/member/dashboard', 'POST', 'assignBookToCourse');
 
   const handleCreateCourse = async () => {
     if (!courseCode || !courseTitle) return;

@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -33,38 +34,15 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import { Modal } from '../../components/Modal';
 
-const GET_VIOLATIONS = gql`
-  query GetViolations($username: String) {
-    getViolationReports(username: $username) {
-      id
-      username
-      type
-      severity
-      description
-      detectedAt
-      resolved
-    }
-  }
-`;
 
-const ANALYZE_PATTERNS = gql`
-  query AnalyzePatterns {
-    analyzeUsagePatterns {
-      id
-      username
-      type
-      severity
-      description
-      detectedAt
-    }
-  }
-`;
+
+
 
 export const SecurityAudit = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedViolation, setSelectedViolation] = useState(null);
   
-  const { data, loading, refetch } = useQuery(GET_VIOLATIONS, {
+  const { data, loading, refetch } = useRestQuery('/api/member/users', 'getViolationReports', {
     variables: { username: searchTerm || undefined }
   });
 

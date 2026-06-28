@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -41,47 +42,13 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const GET_VIOLATIONS = gql`
-  query GetViolations {
-    getViolationReports {
-      id
-      username
-      type
-      severity
-      description
-      detectedAt
-      resolved
-    }
-  }
-`;
 
-const GET_ALL_USERS = gql`
-  query GetAllUsers {
-    getAllUsers {
-      id
-    }
-  }
-`;
 
-const GET_UNASSIGNED_USERS = gql`
-  query GetUnassignedUsers {
-    getUnassignedUsers {
-      id
-      username
-      fullName
-    }
-  }
-`;
 
-const ASSIGN_ROLE = gql`
-  mutation AssignRole($userId: ID!, $role: Role!) {
-    assignRole(userId: $userId, role: $role) {
-      id
-      username
-      roles
-    }
-  }
-`;
+
+
+
+
 
 const StatCard = ({ icon: Icon, label, value, color, bg }) => (
   <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
@@ -110,11 +77,11 @@ export const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
 
-  const { data, loading, error } = useQuery(GET_VIOLATIONS);
-  const { data: allUsersData, loading: usersLoading } = useQuery(GET_ALL_USERS);
-  const { data: unassignedData, refetch: refetchUnassigned } = useQuery(GET_UNASSIGNED_USERS);
+  const { data, loading, error } = useRestQuery('/api/member/users', 'getViolationReports');
+  const { data: allUsersData, loading: usersLoading } = useRestQuery('/api/member/users', 'getAllUsers');
+  const { data: unassignedData, refetch: refetchUnassigned } = useRestQuery('/api/member/unassigned', 'getUnassignedUsers');
 
-  const [assignRole] = useMutation(ASSIGN_ROLE);
+  const [assignRole] = useRestMutation((v) => `/api/member/users/${v.userId}/assign-role?role=${v.role}`, 'POST', 'assignRole');
 
   const handleAssignRole = async () => {
     if (!selectedUser || !selectedRole) return;

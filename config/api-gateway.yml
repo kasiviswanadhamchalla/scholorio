@@ -14,26 +14,43 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
       routes:
-        - id: identity-service-route
-          uri: lb://identity-service
+        - id: catalog-service-route
+          uri: lb://catalog-service
           predicates:
-            - Path=/auth/**
-        - id: book-service-route
-          uri: lb://book-service
-          predicates:
-            - Path=/books/**
-        - id: user-service-route
-          uri: lb://user-service
-          predicates:
-            - Path=/users/**
+            - Path=/api/catalog/**
+          filters:
+            - StripPrefix=2
         - id: lending-service-route
           uri: lb://lending-service
           predicates:
-            - Path=/lending/**
-        - id: reservation-service-route
-          uri: lb://reservation-service
+            - Path=/api/lending/**
+          filters:
+            - StripPrefix=2
+        - id: member-service-route
+          uri: lb://member-service
           predicates:
-            - Path=/reservations/**
+            - Path=/api/member/**
+          filters:
+            - StripPrefix=2
+        - id: notification-service-route
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notification/**
+          filters:
+            - StripPrefix=2
+        # Backwards compatibility routes
+        - id: legacy-auth-route
+          uri: lb://member-service
+          predicates:
+            - Path=/auth/**
+        - id: legacy-books-route
+          uri: lb://catalog-service
+          predicates:
+            - Path=/books/**
+        - id: legacy-lending-route
+          uri: lb://lending-service
+          predicates:
+            - Path=/lending/**
 
 auth:
   jwt:

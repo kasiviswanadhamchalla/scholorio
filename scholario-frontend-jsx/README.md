@@ -1,16 +1,24 @@
-# React + Vite
+# Scholario React Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React web portal for Scholario, built using Vite, Material-UI, and Axios.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Portals:**
+  - **Super Admin Portal:** Security audit log, assign user roles, manage departments.
+  - **Librarian / Assistant Librarian Portal:** Circulation, inventory management, stock controls, and lending request approvals.
+  - **Member Portal:** Book catalog search, user dashboards, issues/renewals, and course assignments.
+- **Role Switching:** Interactive portal switcher allows administrators and developers to switch between `SUPER_ADMIN`, `LIBRARIAN`, `ASSISTANT_LIBRARIAN`, and `MEMBER` roles dynamically.
+- **Axios-Based REST Client:** The application communicates entirely via standard REST endpoints configured through a proxy mapping backends (`/api/catalog`, `/api/lending`, `/api/member`, `/api/notification`).
 
-## React Compiler
+## Running Locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To start the development server, run:
+```bash
+npm run dev
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+To build for production, run:
+```bash
+npm run build
+```

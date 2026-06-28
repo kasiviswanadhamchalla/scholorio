@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useMutation, useQuery } from '@apollo/client/react';
+
+
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -34,70 +35,17 @@ import HistoryIcon from '@mui/icons-material/History';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const ISSUE_BOOK = gql`
-  mutation IssueBook($bookId: ID!, $userId: ID!) {
-    issueBook(input: { bookId: $bookId, userId: $userId }) {
-      id
-      dueDate
-      state { type }
-    }
-  }
-`;
 
-const RETURN_BOOK = gql`
-  mutation ReturnBook($issueId: ID!, $userId: ID!) {
-    returnBook(input: { issueId: $issueId, userId: $userId }) {
-      id
-      returnDate
-      state { type }
-    }
-  }
-`;
 
-const GET_DUE_DATES = gql`
-  query GetDueDates {
-    getDueDates {
-      id
-      bookId
-      userId
-      issueDate
-      dueDate
-      returnDate
-      state {
-        type
-      }
-    }
-  }
-`;
 
-const GET_STUDENTS = gql`
-  query GetStudents {
-    getStudentList {
-      id
-      fullName
-    }
-  }
-`;
 
-const GET_BOOKS = gql`
-  query GetBooks {
-    getAllBooks {
-      id
-      title
-    }
-  }
-`;
 
-const GET_LIBRARIAN_STATS = gql`
-  query GetLibrarianStats {
-    getLibrarianStats {
-      activeIssues
-      overdueIssues
-      returnedToday
-      activeReservations
-    }
-  }
-`;
+
+
+
+
+
+
 
 const StatCard = ({ title, value, icon, color, bg }) => (
   <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
@@ -177,13 +125,13 @@ export const LibrarianDashboard = () => {
   const [selectedBook, setSelectedBook] = useState('');
   const [selectedIssueId, setSelectedIssueId] = useState('');
 
-  const [issueMutation] = useMutation(ISSUE_BOOK);
-  const [returnMutation] = useMutation(RETURN_BOOK);
+  const [issueMutation] = useRestMutation('/api/lending/issue', 'POST', 'issueBook');
+  const [returnMutation] = useRestMutation('/api/lending/return', 'POST', 'returnBook');
   
-  const { loading, error, data, refetch } = useQuery(GET_DUE_DATES);
-  const { data: studentsData } = useQuery(GET_STUDENTS);
-  const { data: booksData } = useQuery(GET_BOOKS);
-  const { data: statsData } = useQuery(GET_LIBRARIAN_STATS);
+  const { loading, error, data, refetch } = useRestQuery('/api/lending/due-dates', 'getDueDates');
+  const { data: studentsData } = useRestQuery('/api/member/users', 'getStudentList');
+  const { data: booksData } = useRestQuery('/api/catalog', 'getAllBooks');
+  const { data: statsData } = useRestQuery('/api/member/dashboard', 'getLibrarianStats');
 
   const handleIssue = async () => {
     if (!selectedBook || !selectedStudent) return;

@@ -1,7 +1,5 @@
 import React from 'react';
-import { ApolloProvider } from '@apollo/client/react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { client } from './graphql/client';
 import { AuthProvider, useAuth } from './features/auth/AuthContext';
 import { PortalLayout } from './features/shared/PortalLayout';
 import { FacultyDashboard } from './features/faculty/FacultyDashboard';
@@ -68,13 +66,13 @@ const AdminPortal = () => {
     { icon: SettingsIcon, label: 'Settings', to: '/admin/settings' },
   ];
   return (
-    <RoleProtectedRoute allowedRoles={['ADMIN']}>
-      <PortalLayout title="Admin Portal" navItems={navItems} />
+    <RoleProtectedRoute allowedRoles={['SUPER_ADMIN']}>
+      <PortalLayout title="Super Admin Portal" navItems={navItems} />
     </RoleProtectedRoute>
   );
 };
 
-const StudentPortal = () => {
+const MemberPortal = () => {
   const navItems = [
     { icon: DashboardIcon, label: 'My Library', to: '/student/dashboard' },
     { icon: SearchIcon, label: 'Search Books', to: '/student/search' },
@@ -82,8 +80,8 @@ const StudentPortal = () => {
     { icon: SettingsIcon, label: 'Settings', to: '/student/settings' },
   ];
   return (
-    <RoleProtectedRoute allowedRoles={['STUDENT']}>
-      <PortalLayout title="Student Portal" navItems={navItems} />
+    <RoleProtectedRoute allowedRoles={['MEMBER']}>
+      <PortalLayout title="Member Portal" navItems={navItems} />
     </RoleProtectedRoute>
   );
 };
@@ -95,7 +93,7 @@ const LibrarianPortal = () => {
     { icon: SettingsIcon, label: 'Settings', to: '/librarian/settings' },
   ];
   return (
-    <RoleProtectedRoute allowedRoles={['LIBRARIAN']}>
+    <RoleProtectedRoute allowedRoles={['LIBRARIAN', 'ASSISTANT_LIBRARIAN']}>
       <PortalLayout title="Librarian Portal" navItems={navItems} />
     </RoleProtectedRoute>
   );
@@ -103,58 +101,47 @@ const LibrarianPortal = () => {
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/faculty" element={<FacultyPortal />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<FacultyDashboard />} />
-              <Route path="books" element={<BookManagement />} />
-              <Route path="courses" element={<CourseManagement />} />
-              <Route path="settings" element={<FacultySettings />} />
-            </Route>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/admin" element={<AdminPortal />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="security" element={<SecurityAudit />} />
+            <Route path="departments" element={<DepartmentsManagement />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
 
-            <Route path="/admin" element={<AdminPortal />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="security" element={<SecurityAudit />} />
-              <Route path="departments" element={<DepartmentsManagement />} />
-              <Route path="settings" element={<AdminSettings />} />
-            </Route>
+          <Route path="/student" element={<MemberPortal />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="search" element={<StudentSearch />} />
+            <Route path="courses" element={<StudentCourses />} />
+            <Route path="settings" element={<StudentSettings />} />
+          </Route>
 
-            <Route path="/student" element={<StudentPortal />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="search" element={<StudentSearch />} />
-              <Route path="courses" element={<StudentCourses />} />
-              <Route path="settings" element={<StudentSettings />} />
-            </Route>
+          <Route path="/librarian" element={<LibrarianPortal />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<LibrarianDashboard />} />
+            <Route path="stock" element={<LibrarianStock />} />
+            <Route path="settings" element={<LibrarianSettings />} />
+          </Route>
 
-            <Route path="/librarian" element={<LibrarianPortal />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<LibrarianDashboard />} />
-              <Route path="stock" element={<LibrarianStock />} />
-              <Route path="settings" element={<LibrarianSettings />} />
-            </Route>
+          <Route path="/unassigned" element={<UnassignedPage />} />
 
-            <Route path="/unassigned" element={<UnassignedPage />} />
-
-            {/* Role-based redirection at root */}
-            <Route path="/" element={<RootRedirect />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </ApolloProvider>
+          {/* Role-based redirection at root */}
+          <Route path="/" element={<RootRedirect />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
 const RootRedirect = () => {
   const { role } = useAuth();
-  if (role === 'ADMIN') return <Navigate to="/admin" replace />;
-  if (role === 'FACULTY') return <Navigate to="/faculty" replace />;
-  if (role === 'LIBRARIAN') return <Navigate to="/librarian" replace />;
-  if (role === 'STUDENT') return <Navigate to="/student" replace />;
+  if (role === 'SUPER_ADMIN') return <Navigate to="/admin" replace />;
+  if (role === 'LIBRARIAN' || role === 'ASSISTANT_LIBRARIAN') return <Navigate to="/librarian" replace />;
+  if (role === 'MEMBER') return <Navigate to="/student" replace />;
   if (role === 'UNASSIGNED') return <Navigate to="/unassigned" replace />;
   
   return (

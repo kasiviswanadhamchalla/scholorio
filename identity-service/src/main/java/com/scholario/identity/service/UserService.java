@@ -119,8 +119,8 @@ public class UserService {
     public User linkFacultyToDepartment(Long facultyId, Long departmentId) {
         User user = userRepository.findById(facultyId)
                 .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND));
-        if (!user.getRoles().contains(Role.FACULTY)) {
-            throw new IllegalStateException("Only faculty can be linked to a department");
+        if (!user.getRoles().contains(Role.MEMBER)) {
+            throw new IllegalStateException("Only members can be linked to a department");
         }
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Department not found"));
@@ -147,11 +147,11 @@ public class UserService {
     }
 
     public List<User> getFacultyList() {
-        return userRepository.findByRoles(Role.FACULTY);
+        return userRepository.findByRoles(Role.MEMBER);
     }
 
     public List<User> getStudentList() {
-        return userRepository.findByRoles(Role.STUDENT);
+        return userRepository.findByRoles(Role.MEMBER);
     }
 
     public List<User> getAllUsers() {

@@ -1,30 +1,27 @@
 package com.scholario.royalty.client;
 
-import org.springframework.graphql.client.HttpGraphQlClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class BookServiceClient {
 
-    private final HttpGraphQlClient graphQlClient;
+    private final WebClient webClient;
 
     public BookServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.graphQlClient = HttpGraphQlClient.builder(loadBalancedWebClientBuilder.build())
-                .url("http://book-service/graphql")
-                .build();
+        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://catalog-service").build();
     }
 
     public Boolean existsById(Long id) {
-        String query = """
-            query ExistsBook($id: ID!) {
-                existsBook(id: $id)
-            }
-            """;
-        return graphQlClient.document(query)
-                .variable("id", id)
-                .retrieve("existsBook")
-                .toEntity(Boolean.class)
-                .block();
+        try {
+            return webClient.get()
+                    .uri("/api/{id}/exists", id)
+                    .retrieve()
+                    .bodyToMono(Boolean.class)
+                    .block();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
