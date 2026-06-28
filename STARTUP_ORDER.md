@@ -51,7 +51,7 @@ The gateway should be started after all other microservices have registered with
 
 | Start Order | Service Name | Gradle Command | Port | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| **7** | `api-gateway` | `./gradlew :api-gateway:bootRun` | `8080` | Centralized API entry point. |
+| **7** | `api-gateway` | `./gradlew :api-gateway:bootRun` | `8090` | Centralized API entry point. |
 
 ---
 

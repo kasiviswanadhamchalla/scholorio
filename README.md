@@ -52,7 +52,7 @@ Scholario provides a complete solution for managing academic resources including
 * **lending-service** (Port 8082) - Lending & Approvals
 * **member-service** (Port 8083) - User profiles, Departments & Admin Dashboard
 * **notification-service** (Port 8084) - Alerts & User notifications
-* **api-gateway** (Port 8080) - API Routing
+* **api-gateway** (Port 8090) - API Routing / Gateway base URL
 
 ### Design Standards
 - **REST-First:** All business logic exposed via RESTful HTTP APIs.
