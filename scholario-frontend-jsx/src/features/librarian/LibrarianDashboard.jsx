@@ -121,7 +121,7 @@ export const LibrarianDashboard = () => {
   const navigate = useNavigate();
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState('');
+  const [selectedMember, setSelectedMember] = useState('');
   const [selectedBook, setSelectedBook] = useState('');
   const [selectedIssueId, setSelectedIssueId] = useState('');
 
@@ -129,19 +129,19 @@ export const LibrarianDashboard = () => {
   const [returnMutation] = useRestMutation('/api/lending/return', 'POST', 'returnBook');
   
   const { loading, error, data, refetch } = useRestQuery('/api/lending/due-dates', 'getDueDates');
-  const { data: studentsData } = useRestQuery('/api/member/users', 'getStudentList');
+  const { data: membersData } = useRestQuery('/api/member/users', 'getStudentList');
   const { data: booksData } = useRestQuery('/api/catalog', 'getAllBooks');
   const { data: statsData } = useRestQuery('/api/member/dashboard', 'getLibrarianStats');
 
   const handleIssue = async () => {
-    if (!selectedBook || !selectedStudent) return;
+    if (!selectedBook || !selectedMember) return;
     try {
       await issueMutation({ 
-        variables: { bookId: selectedBook, userId: selectedStudent } 
+        variables: { bookId: selectedBook, userId: selectedMember } 
       });
       setIsIssueModalOpen(false);
       setSelectedBook('');
-      setSelectedStudent('');
+      setSelectedMember('');
       refetch();
     } catch (err) {
       console.error('Failed to issue book:', err);
@@ -149,28 +149,28 @@ export const LibrarianDashboard = () => {
   };
 
   const handleReturn = async () => {
-    if (!selectedIssueId || !selectedStudent) return;
+    if (!selectedIssueId || !selectedMember) return;
     try {
       await returnMutation({ 
-        variables: { issueId: selectedIssueId, userId: selectedStudent } 
+        variables: { issueId: selectedIssueId, userId: selectedMember } 
       });
       setIsReturnModalOpen(false);
       setSelectedIssueId('');
-      setSelectedStudent('');
+      setSelectedMember('');
       refetch();
     } catch (err) {
       console.error('Failed to return book:', err);
     }
   };
 
-  const studentOptions = studentsData?.getStudentList.map((s) => ({ id: s.id, name: s.fullName })) || [];
+  const memberOptions = membersData?.getStudentList.map((s) => ({ id: s.id, name: s.fullName })) || [];
   const bookOptions = booksData?.getAllBooks.map((b) => ({ id: b.id, name: b.title })) || [];
   
-  const activeIssuesForStudent = data?.getDueDates.filter(
-    (issue) => issue.userId === selectedStudent && issue.state.type !== 'RETURNED'
+  const activeIssuesForMember = data?.getDueDates.filter(
+    (issue) => issue.userId === selectedMember && issue.state.type !== 'RETURNED'
   ) || [];
 
-  const issueOptions = activeIssuesForStudent.map((issue) => {
+  const issueOptions = activeIssuesForMember.map((issue) => {
     const book = booksData?.getAllBooks.find((b) => b.id === issue.bookId);
     return {
       id: issue.id,
@@ -187,7 +187,7 @@ export const LibrarianDashboard = () => {
             Librarian Hub
           </Typography>
           <Typography variant="body2" color="text.secondary" fontWeight={500}>
-            Manage circulation, track assets, and handle student requests.
+            Manage circulation, track assets, and handle member requests.
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1.5, width: { xs: '100%', sm: 'auto' } }}>
@@ -227,40 +227,33 @@ export const LibrarianDashboard = () => {
       </Box>
 
       {/* Stats row */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Active Issues" 
-            value={statsData?.getLibrarianStats.activeIssues.toString() || "0"} 
-            color="#4f46e5" bg="#e0e7ff"
-            icon={<BookIcon />} 
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Overdue" 
-            value={statsData?.getLibrarianStats.overdueIssues.toString() || "0"} 
-            color="#e11d48" bg="#ffe4e6"
-            icon={<WarningAmberIcon />} 
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Returned (Today)" 
-            value={statsData?.getLibrarianStats.returnedToday.toString() || "0"} 
-            color="#10b981" bg="#d1fae5"
-            icon={<CheckCircleIcon />} 
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Reservations" 
-            value={statsData?.getLibrarianStats.activeReservations.toString() || "0"} 
-            color="#d97706" bg="#fef3c7"
-            icon={<AccessTimeIcon />} 
-          />
-        </Grid>
-      </Grid>
+      {/* Stats row */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
+        <StatCard 
+          title="Active Issues" 
+          value={statsData?.getLibrarianStats.activeIssues.toString() || "0"} 
+          color="#4f46e5" bg="#e0e7ff"
+          icon={<BookIcon />} 
+        />
+        <StatCard 
+          title="Overdue" 
+          value={statsData?.getLibrarianStats.overdueIssues.toString() || "0"} 
+          color="#e11d48" bg="#ffe4e6"
+          icon={<WarningAmberIcon />} 
+        />
+        <StatCard 
+          title="Returned (Today)" 
+          value={statsData?.getLibrarianStats.returnedToday.toString() || "0"} 
+          color="#10b981" bg="#d1fae5"
+          icon={<CheckCircleIcon />} 
+        />
+        <StatCard 
+          title="Reservations" 
+          value={statsData?.getLibrarianStats.activeReservations.toString() || "0"} 
+          color="#d97706" bg="#fef3c7"
+          icon={<AccessTimeIcon />} 
+        />
+      </Box>
 
       {/* Split layout */}
       <Grid container spacing={4}>
@@ -272,7 +265,7 @@ export const LibrarianDashboard = () => {
             </Typography>
             <ActionCard 
               title="Issue Book" 
-              description="Record a new book loan to a student" 
+              description="Record a new book loan to a member" 
               icon={LibraryAddIcon} 
               color="indigo" 
               onClick={() => setIsIssueModalOpen(true)}
@@ -323,7 +316,7 @@ export const LibrarianDashboard = () => {
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                   <TableRow sx={{ '& th': { fontSize: 10, fontWeight: 'black', color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1.2 } }}>
                     <TableCell sx={{ pl: 4 }}>Book</TableCell>
-                    <TableCell>Student</TableCell>
+                    <TableCell>Member</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Due Date</TableCell>
                   </TableRow>
@@ -350,7 +343,7 @@ export const LibrarianDashboard = () => {
                   ) : (
                     data?.getDueDates.map((issue) => {
                       const book = booksData?.getAllBooks.find((b) => b.id === issue.bookId);
-                      const student = studentsData?.getStudentList.find((s) => s.id === issue.userId);
+                      const member = membersData?.getStudentList.find((s) => s.id === issue.userId);
                       return (
                         <TableRow key={issue.id} sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
                           <TableCell sx={{ pl: 4, py: 2 }}>
@@ -362,7 +355,7 @@ export const LibrarianDashboard = () => {
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ fontSize: 12, color: 'text.secondary', fontWeight: 500, fontFamily: 'sans-serif' }}>
-                            {student?.fullName || `User #${issue.userId}`}
+                            {member?.fullName || `User #${issue.userId}`}
                           </TableCell>
                           <TableCell>
                             <Chip 
@@ -394,15 +387,15 @@ export const LibrarianDashboard = () => {
         isOpen={isIssueModalOpen}
         onClose={() => setIsIssueModalOpen(false)}
         title="Issue New Book"
-        subtitle="Create a new lending record for a student"
+        subtitle="Create a new lending record for a member"
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5 }}>
           <CustomSelect 
-            label="Select Student"
-            options={studentOptions}
-            value={selectedStudent}
-            onChange={setSelectedStudent}
-            placeholder="Search for a student..."
+            label="Select Member"
+            options={memberOptions}
+            value={selectedMember}
+            onChange={setSelectedMember}
+            placeholder="Search for a member..."
           />
           <CustomSelect 
             label="Select Book"
@@ -413,7 +406,7 @@ export const LibrarianDashboard = () => {
           />
           <Button 
             onClick={handleIssue}
-            disabled={!selectedStudent || !selectedBook}
+            disabled={!selectedMember || !selectedBook}
             variant="contained"
             sx={{ 
               py: 1.5, 
@@ -442,25 +435,25 @@ export const LibrarianDashboard = () => {
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5 }}>
           <CustomSelect 
-            label="Select Student"
-            options={studentOptions}
-            value={selectedStudent}
+            label="Select Member"
+            options={memberOptions}
+            value={selectedMember}
             onChange={(val) => {
-              setSelectedStudent(val);
+              setSelectedMember(val);
               setSelectedIssueId('');
             }}
-            placeholder="Search for a student..."
+            placeholder="Search for a member..."
           />
           <CustomSelect 
             label="Active Issue"
             options={issueOptions}
             value={selectedIssueId}
             onChange={setSelectedIssueId}
-            placeholder={selectedStudent ? "Select an active loan..." : "Select a student first"}
+            placeholder={selectedMember ? "Select an active loan..." : "Select a member first"}
           />
           <Button 
             onClick={handleReturn}
-            disabled={!selectedStudent || !selectedIssueId}
+            disabled={!selectedMember || !selectedIssueId}
             variant="contained"
             color="success"
             sx={{ 

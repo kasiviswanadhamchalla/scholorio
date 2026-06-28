@@ -89,11 +89,11 @@ export const PortalLayout = ({ title, navItems }) => {
                   <Icon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText 
-                  primary={item.label} 
-                  primaryTypographyProps={{ 
-                    fontSize: 14, 
-                    fontWeight: isActive ? 600 : 500 
-                  }} 
+                  primary={
+                    <Typography sx={{ fontSize: 14, fontWeight: isActive ? 600 : 500 }}>
+                      {item.label}
+                    </Typography>
+                  }
                 />
               </ListItemButton>
             </ListItem>
@@ -103,49 +103,6 @@ export const PortalLayout = ({ title, navItems }) => {
 
       {/* Sidebar Footer (Role Switch & Logout) */}
       <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-        {allRoles.length > 1 && (
-          <Box sx={{ mb: 2, px: 1 }}>
-            <Typography 
-              variant="caption" 
-              fontWeight="bold" 
-              color="text.disabled" 
-              sx={{ display: 'block', mb: 1, letterSpacing: 1.2, textTransform: 'uppercase', fontSize: 10 }}
-            >
-              Switch Portal
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-              {allRoles.map((r) => (
-                <Button
-                  key={r}
-                  variant={r === role ? 'contained' : 'text'}
-                  color="primary"
-                  size="small"
-                  disabled={r === role}
-                  onClick={() => {
-                    switchRole(r);
-                    setMobileOpen(false);
-                  }}
-                  startIcon={<SwapHorizIcon sx={{ fontSize: 14 }} />}
-                  sx={{
-                    justifyContent: 'flex-start',
-                    textTransform: 'uppercase',
-                    py: 0.75,
-                    px: 1.5,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    borderRadius: 2,
-                    boxShadow: 'none',
-                    '&:hover': {
-                      boxShadow: 'none',
-                    }
-                  }}
-                >
-                  {r} Portal
-                </Button>
-              ))}
-            </Box>
-          </Box>
-        )}
         
         <ListItem disablePadding>
           <ListItemButton
@@ -165,8 +122,11 @@ export const PortalLayout = ({ title, navItems }) => {
               <LogoutIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText 
-              primary="Logout" 
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 600 }} 
+              primary={
+                <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                  Logout
+                </Typography>
+              }
             />
           </ListItemButton>
         </ListItem>
@@ -234,8 +194,53 @@ export const PortalLayout = ({ title, navItems }) => {
               </Typography>
             </Box>
 
-            {/* Profile Info */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {/* Role Switcher & Profile Info */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
+              {allRoles.length > 1 && (
+                <Box 
+                  sx={{ 
+                    display: { xs: 'none', md: 'flex' }, 
+                    alignItems: 'center', 
+                    bgcolor: 'grey.100', 
+                    borderRadius: 3, 
+                    p: 0.5,
+                    border: '1px solid',
+                    borderColor: 'grey.200'
+                  }}
+                >
+                  {allRoles.map((r) => (
+                    <Button
+                      key={r}
+                      variant="text"
+                      size="small"
+                      disabled={r === role}
+                      onClick={() => switchRole(r)}
+                      sx={{
+                        borderRadius: 2.5,
+                        textTransform: 'uppercase',
+                        py: 0.5,
+                        px: 1.75,
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: 0.5,
+                        bgcolor: r === role ? 'white' : 'transparent',
+                        color: r === role ? 'primary.main' : 'text.secondary',
+                        boxShadow: r === role ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                        '&:hover': {
+                          bgcolor: r === role ? 'white' : 'grey.200',
+                        },
+                        '&:disabled': {
+                          color: 'primary.main',
+                          bgcolor: 'white'
+                        }
+                      }}
+                    >
+                      {r}
+                    </Button>
+                  ))}
+                </Box>
+              )}
+
               <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
                 <Typography variant="subtitle2" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
                   {username}
@@ -271,10 +276,11 @@ export const PortalLayout = ({ title, navItems }) => {
             p: { xs: 2, sm: 4 }, 
             display: 'flex', 
             flexDirection: 'column', 
-            alignItems: 'center' 
+            alignItems: 'stretch',
+            bgcolor: '#f1f5f9' // Premium Slate-100 Background
           }}
         >
-          <Box sx={{ width: '100%', maxWidth: 1200 }}>
+          <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }} className="animate-fade-in">
             <Outlet />
           </Box>
         </Box>

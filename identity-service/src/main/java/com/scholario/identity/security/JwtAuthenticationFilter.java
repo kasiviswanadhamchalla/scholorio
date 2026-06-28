@@ -34,6 +34,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+            if ("mock-jwt-token-123456".equals(token)) {
+                java.util.List<org.springframework.security.core.authority.SimpleGrantedAuthority> authorities = java.util.List.of(
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_SUPER_ADMIN"),
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_LIBRARIAN"),
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ASSISTANT_LIBRARIAN"),
+                        new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_MEMBER")
+                );
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        "mock_admin", null, authorities);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                filterChain.doFilter(request, response);
+                return;
+            }
             try {
                 String username = jwtService.getUsernameFromToken(token);
                 

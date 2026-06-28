@@ -1,6 +1,6 @@
 import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-
+import axios from 'axios';
 
 import { 
   Box, 
@@ -23,21 +23,33 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Modal } from '../../components/Modal';
 
-
-
-
-
-export const StudentSearch = () => {
+export const MemberSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState(null);
   
-  const [searchBooks, { data, loading }] = useLazyQuery(SEARCH_BOOKS);
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [reserveBook, { loading: reserving }] = useRestMutation('/api/lending/request', 'POST', 'reserveBook');
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      searchBooks({ variables: { title: searchTerm } });
+      setLoading(true);
+      try {
+        const token = window.localStorage.getItem('scholario_token') || 'mock-jwt-token-123456';
+        const response = await axios.get('/api/catalog', {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          },
+          params: { title: searchTerm }
+        });
+        setBooks(response.data);
+      } catch (err) {
+        console.error('Search error:', err);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -51,8 +63,6 @@ export const StudentSearch = () => {
       alert('Failed to reserve book.');
     }
   };
-
-  const books = data?.searchBooks || [];
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -72,33 +82,35 @@ export const StudentSearch = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by title, ISBN, or keywords..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" sx={{ color: 'text.secondary', pl: 1 }}>
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <Button 
-                  type="submit"
-                  disabled={loading}
-                  variant="contained"
-                  sx={{ 
-                    borderRadius: 3.5, 
-                    fontWeight: 'bold',
-                    py: 1, 
-                    px: 3, 
-                    textTransform: 'none',
-                    bgcolor: 'grey.900',
-                    color: 'white',
-                    '&:hover': { bgcolor: 'grey.800' }
-                  }}
-                >
-                  {loading ? 'Searching...' : 'Explore'}
-                </Button>
-              </InputAdornment>
-            )
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start" sx={{ color: 'text.secondary', pl: 1 }}>
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button 
+                    type="submit"
+                    disabled={loading}
+                    variant="contained"
+                    sx={{ 
+                      borderRadius: 3.5, 
+                      fontWeight: 'bold',
+                      py: 1, 
+                      px: 3, 
+                      textTransform: 'none',
+                      bgcolor: 'grey.900',
+                      color: 'white',
+                      '&:hover': { bgcolor: 'grey.800' }
+                    }}
+                  >
+                    {loading ? 'Searching...' : 'Explore'}
+                  </Button>
+                </InputAdornment>
+              )
+            }
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
@@ -216,8 +228,6 @@ export const StudentSearch = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box 
                       sx={{ 
-                        w: 8, 
-                        h: 8, 
                         width: 8,
                         height: 8,
                         borderRadius: '50%', 

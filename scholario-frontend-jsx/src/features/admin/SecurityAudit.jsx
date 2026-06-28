@@ -42,11 +42,11 @@ export const SecurityAudit = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedViolation, setSelectedViolation] = useState(null);
   
-  const { data, loading, refetch } = useRestQuery('/api/member/users', 'getViolationReports', {
-    variables: { username: searchTerm || undefined }
+  const { data, loading, refetch } = useRestQuery('/api/audit/reports', 'getViolationReports', {
+    username: searchTerm || undefined
   });
 
-  const { data: patternData, loading: patternLoading } = useQuery(ANALYZE_PATTERNS);
+  const { data: patternData, loading: patternLoading } = useRestQuery('/api/audit/analyze-patterns', 'analyzeUsagePatterns');
 
   const violations = data?.getViolationReports || [];
   const patterns = patternData?.analyzeUsagePatterns || [];

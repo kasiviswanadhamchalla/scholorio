@@ -102,7 +102,7 @@ export const LibrarianSettings = () => {
                 {profile?.fullName}
               </Typography>
               <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ display: 'block', mt: 0.5, fontFamily: 'monospace', textTransform: 'uppercase' }}>
-                NODE_ID: {profile?.id.substring(0, 8)}
+                NODE_ID: {profile?.id?.toString()?.substring(0, 8) || 'N/A'}
               </Typography>
               <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                 <Chip 

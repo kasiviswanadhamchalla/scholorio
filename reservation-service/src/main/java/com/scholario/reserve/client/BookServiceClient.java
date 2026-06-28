@@ -10,7 +10,7 @@ public class BookServiceClient {
     private final WebClient webClient;
 
     public BookServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://catalog-service").build();
+        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://book-service").build();
     }
 
     public BookDto getBookById(Long id) {

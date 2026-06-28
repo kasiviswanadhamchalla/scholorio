@@ -10,7 +10,7 @@ public class IdentityServiceClient {
     private final WebClient webClient;
 
     public IdentityServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://member-service").build();
+        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://identity-service").build();
     }
 
     public UserDto getUserById(Long id) {

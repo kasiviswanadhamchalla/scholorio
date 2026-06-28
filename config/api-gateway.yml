@@ -14,8 +14,8 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
       routes:
-        - id: catalog-service-route
-          uri: lb://catalog-service
+        - id: book-service-route
+          uri: lb://book-service
           predicates:
             - Path=/api/catalog/**
           filters:
@@ -26,8 +26,8 @@ spring:
             - Path=/api/lending/**
           filters:
             - StripPrefix=2
-        - id: member-service-route
-          uri: lb://member-service
+        - id: identity-service-route
+          uri: lb://identity-service
           predicates:
             - Path=/api/member/**
           filters:
@@ -38,13 +38,61 @@ spring:
             - Path=/api/notification/**
           filters:
             - StripPrefix=2
+        - id: course-service-route
+          uri: lb://course-service
+          predicates:
+            - Path=/api/course/**
+          filters:
+            - StripPrefix=2
+        - id: approval-service-route
+          uri: lb://approval-service
+          predicates:
+            - Path=/api/approval/**
+          filters:
+            - StripPrefix=2
+        - id: royalty-service-route
+          uri: lb://royalty-service
+          predicates:
+            - Path=/api/royalty/**
+          filters:
+            - StripPrefix=2
+        - id: digital-content-service-route
+          uri: lb://digital-content-service
+          predicates:
+            - Path=/api/digital/**
+          filters:
+            - StripPrefix=2
+        - id: search-service-route
+          uri: lb://search-service
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - StripPrefix=2
+        - id: analytics-service-route
+          uri: lb://analytics-service
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - StripPrefix=2
+        - id: audit-service-route
+          uri: lb://audit-service
+          predicates:
+            - Path=/api/audit/**
+          filters:
+            - StripPrefix=2
+        - id: reservation-service-route
+          uri: lb://reservation-service
+          predicates:
+            - Path=/api/reservation/**
+          filters:
+            - StripPrefix=2
         # Backwards compatibility routes
         - id: legacy-auth-route
-          uri: lb://member-service
+          uri: lb://identity-service
           predicates:
             - Path=/auth/**
         - id: legacy-books-route
-          uri: lb://catalog-service
+          uri: lb://book-service
           predicates:
             - Path=/books/**
         - id: legacy-lending-route

@@ -107,12 +107,14 @@ export const LibrarianStock = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search inventory by title or ISBN..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" sx={{ pl: 0.5 }}>
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            )
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start" sx={{ pl: 0.5 }}>
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              )
+            }
           }}
           sx={{
             flexGrow: 1,
