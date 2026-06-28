@@ -258,7 +258,7 @@ export const LibrarianDashboard = () => {
       {/* Split layout */}
       <Grid container spacing={4}>
         {/* Circulation Desk Actions */}
-        <Grid item xs={12} lg={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Grid xs={12} lg={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Typography variant="caption" fontWeight="black" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1.5, pl: 0.5 }}>
               Circulation Desk
@@ -302,7 +302,7 @@ export const LibrarianDashboard = () => {
         </Grid>
 
         {/* Live activity log */}
-        <Grid item xs={12} lg={8}>
+        <Grid xs={12} lg={8}>
           <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
             <Box sx={{ px: 3, py: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50' }}>
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>

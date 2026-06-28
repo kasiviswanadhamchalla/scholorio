@@ -25,16 +25,7 @@ public class KeycloakJwtAuthenticationConverter implements Converter<Jwt, Abstra
                 extractResourceRoles(jwt).stream()
         ).collect(Collectors.toSet());
 
-        String username = jwt.getClaimAsString("preferred_username");
-        String email = jwt.getClaimAsString("email");
-        if ("chkv.2024@gmail.com".equalsIgnoreCase(email) || "chkv.2024@gmail.com".equalsIgnoreCase(username)) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"));
-            authorities.add(new SimpleGrantedAuthority("ROLE_LIBRARIAN"));
-            authorities.add(new SimpleGrantedAuthority("ROLE_ASSISTANT_LIBRARIAN"));
-            authorities.add(new SimpleGrantedAuthority("ROLE_MEMBER"));
-        }
-
-        return new JwtAuthenticationToken(jwt, authorities, username);
+        return new JwtAuthenticationToken(jwt, authorities, jwt.getClaimAsString("preferred_username"));
     }
 
     @SuppressWarnings("unchecked")
