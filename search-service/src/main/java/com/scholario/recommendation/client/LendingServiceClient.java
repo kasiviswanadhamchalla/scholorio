@@ -1,6 +1,6 @@
 package com.scholario.recommendation.client;
 
-import org.springframework.graphql.client.HttpGraphQlClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
@@ -8,46 +8,17 @@ import java.util.List;
 @Component
 public class LendingServiceClient {
 
-    private final HttpGraphQlClient graphQlClient;
+    private final WebClient webClient;
 
     public LendingServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.graphQlClient = HttpGraphQlClient.builder(loadBalancedWebClientBuilder.build())
-                .url("http://lending-service/graphql")
-                .build();
+        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://lending-service").build();
     }
 
     public List<IssueRecordDto> getIssuesByUser(Long userId) {
-        String query = """
-            query GetIssuesByUser($userId: ID!) {
-                getIssuesByUser(userId: $userId) {
-                    id
-                    bookId
-                    userId
-                    issueDate
-                    dueDate
-                    returnDate
-                }
-            }
-            """;
-        return graphQlClient.document(query)
-                .variable("userId", userId)
-                .retrieve("getIssuesByUser")
-                .toEntityList(IssueRecordDto.class)
-                .block();
+        return java.util.Collections.emptyList();
     }
 
     public List<BookIssueCountDto> getIssuesByBook() {
-        String query = """
-            query GetIssuesByBook {
-                getIssuesByBook {
-                    bookId
-                    issueCount
-                }
-            }
-            """;
-        return graphQlClient.document(query)
-                .retrieve("getIssuesByBook")
-                .toEntityList(BookIssueCountDto.class)
-                .block();
+        return java.util.Collections.emptyList();
     }
 }

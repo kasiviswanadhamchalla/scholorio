@@ -1,7 +1,8 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React from 'react';
 import { useAuth } from './AuthContext';
-import { gql } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
+
+
 import { Navigate } from 'react-router-dom';
 import { 
   Box, 
@@ -19,22 +20,12 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
-const GET_MY_PROFILE = gql`
-  query GetMyProfile {
-    getMyProfile {
-      id
-      username
-      email
-      fullName
-      roles
-    }
-  }
-`;
+
 
 export const UnassignedPage = () => {
   const { logout, username, role } = useAuth();
   
-  const { loading } = useQuery(GET_MY_PROFILE, {
+  const { loading } = useRestQuery('/api/member/profile', 'getMyProfile', {
     fetchPolicy: 'network-only',
     onCompleted: (data) => {
       console.log('[Auth] User profile synced with backend:', data?.getMyProfile?.username);

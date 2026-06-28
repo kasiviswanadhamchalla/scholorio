@@ -20,11 +20,11 @@ Scholario uses several roles to control access to different modules.
 
 1. Navigate to **Realm Settings** -> **Roles**.
 2. Click **Create Role** for each of the following:
-   - `ADMIN`: Full system access.
-   - `LIBRARIAN`: Access to lending, books, and inventory management.
-   - `FACULTY`: Access to course management and content uploading.
-   - `STUDENT`: Access to borrowing and viewing content.
-   - `UNASSIGNED`: Default roles for new users before they are assigned a specific roles.
+   - `SUPER_ADMIN`: Full system access, auditing, and role assigning.
+   - `LIBRARIAN`: Access to lending, catalog management, and level-2 approvals.
+   - `ASSISTANT_LIBRARIAN`: Circulation tasks, and level-1 approvals.
+   - `MEMBER`: Access to borrowing, dashboard, and searching catalogs.
+   - `UNASSIGNED`: Default role for new users before role assignment.
 
 ## 4. Create Clients
 
@@ -76,7 +76,7 @@ Ensure that roles and user information are correctly mapped in the JWT token.
 6. Click **Create**.
 7. Go to the **Credentials** tab and set a password (e.g., `password`). Turn **Temporary** to `OFF`.
 8. Go to the **Role Mappings** tab.
-9. Assign one or more roles (e.g., `STUDENT`, `ADMIN`).
+9. Assign one or more roles (e.g., MEMBER, SUPER_ADMIN).
 
 ## 7. Project Configuration
 

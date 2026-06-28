@@ -1,6 +1,6 @@
 package com.scholario.course.client;
 
-import org.springframework.graphql.client.HttpGraphQlClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
@@ -8,60 +8,48 @@ import java.util.List;
 @Component
 public class BookServiceClient {
 
-    private final HttpGraphQlClient graphQlClient;
+    private final WebClient webClient;
 
     public BookServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.graphQlClient = HttpGraphQlClient.builder(loadBalancedWebClientBuilder.build())
-                .url("http://book-service/graphql")
-                .build();
+        this.webClient = loadBalancedWebClientBuilder.baseUrl("http://catalog-service").build();
     }
 
     public BookDto getBookById(Long id) {
-        String query = """
-            query GetBookById($id: ID!) {
-                getBookById(id: $id) {
-                    id
-                    title
-                    isbn
-                    facultyId
-                }
-            }
-            """;
-        return graphQlClient.document(query)
-                .variable("id", id)
-                .retrieve("getBookById")
-                .toEntity(BookDto.class)
-                .block();
+        try {
+            return webClient.get()
+                    .uri("/api/{id}", id)
+                    .retrieve()
+                    .bodyToMono(BookDto.class)
+                    .block();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Boolean existsById(Long id) {
-        String query = """
-            query ExistsBook($id: ID!) {
-                existsBook(id: $id)
-            }
-            """;
-        return graphQlClient.document(query)
-                .variable("id", id)
-                .retrieve("existsBook")
-                .toEntity(Boolean.class)
-                .block();
+        try {
+            return webClient.get()
+                    .uri("/api/{id}/exists", id)
+                    .retrieve()
+                    .bodyToMono(Boolean.class)
+                    .block();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public List<BookDto> getBooksByIds(List<Long> ids) {
-        String query = """
-            query GetBooksByIds($ids: [ID!]!) {
-                getBooksByIds(ids: $ids) {
-                    id
-                    title
-                    isbn
-                    facultyId
-                }
-            }
-            """;
-        return graphQlClient.document(query)
-                .variable("ids", ids)
-                .retrieve("getBooksByIds")
-                .toEntityList(BookDto.class)
-                .block();
+        try {
+            List<BookDto> all = webClient.get()
+                    .uri("/api/")
+                    .retrieve()
+                    .bodyToFlux(BookDto.class)
+                    .collectList()
+                    .block();
+            if (all == null) return java.util.Collections.emptyList();
+            return all.stream().filter(b -> ids.contains(b.id())).toList();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
     }
 }

@@ -19,11 +19,14 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
-@RequiredArgsConstructor
 public class KeycloakUserSyncFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(KeycloakUserSyncFilter.class);
     private final UserService userService;
+
+    public KeycloakUserSyncFilter(@org.springframework.context.annotation.Lazy UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

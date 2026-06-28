@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
@@ -33,56 +34,13 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const GET_MY_PROFILE = gql`
-  query GetMyProfile {
-    getMyProfile {
-      id
-      fullName
-    }
-  }
-`;
 
-const GET_FACULTY_STATS = gql`
-  query GetFacultyStats($facultyId: ID!) {
-    getBooksByFaculty(facultyId: $facultyId) {
-      id
-      state {
-        type
-      }
-    }
-    getCoursesByFaculty(facultyId: $facultyId) {
-      id
-    }
-    getFacultyPerformance(facultyId: $facultyId) {
-      totalStudentEngagement
-    }
-    getMyNotifications {
-      id
-      type
-      message
-      createdAt
-    }
-  }
-`;
 
-const GET_DEPARTMENTS = gql`
-  query GetDepartments {
-    getDepartments {
-      id
-      name
-    }
-  }
-`;
 
-const CREATE_BOOK = gql`
-  mutation CreateBook($input: BookInput!) {
-    createBook(input: $input) {
-      id
-      title
-      isbn
-    }
-  }
-`;
+
+
+
+
 
 const StatCard = ({ icon: Icon, label, value, color, bg }) => (
   <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
@@ -104,16 +62,16 @@ const StatCard = ({ icon: Icon, label, value, color, bg }) => (
 
 export const FacultyDashboard = () => {
   const navigate = useNavigate();
-  const { data: profileData } = useQuery(GET_MY_PROFILE);
+  const { data: profileData } = useRestQuery('/api/member/profile', 'getMyProfile');
   const facultyId = profileData?.getMyProfile?.id;
 
-  const { data: statsData, loading: statsLoading } = useQuery(GET_FACULTY_STATS, {
+  const { data: statsData, loading: statsLoading } = useRestQuery('/api/member/dashboard', 'getFacultyStats', {
     variables: { facultyId },
     skip: !facultyId
   });
 
-  const { data: deptData, loading: deptLoading } = useQuery(GET_DEPARTMENTS);
-  const [createBook] = useMutation(CREATE_BOOK, {
+  const { data: deptData, loading: deptLoading } = useRestQuery('/api/member/departments', 'getDepartments');
+  const [createBook] = useRestMutation('/api/catalog', 'POST', 'createBook', {
     refetchQueries: ['GetFacultyStats'],
   });
 

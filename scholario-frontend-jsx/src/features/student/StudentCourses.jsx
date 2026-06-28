@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React from 'react';
-import { gql } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -12,16 +13,10 @@ import {
 import SchoolIcon from '@mui/icons-material/School';
 import BookIcon from '@mui/icons-material/Book';
 
-const GET_MY_PROFILE = gql`
-  query GetMyProfile {
-    getMyProfile {
-      id
-    }
-  }
-`;
+
 
 export const StudentCourses = () => {
-  const { data: profileData } = useQuery(GET_MY_PROFILE);
+  const { data: profileData } = useRestQuery('/api/member/profile', 'getMyProfile');
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

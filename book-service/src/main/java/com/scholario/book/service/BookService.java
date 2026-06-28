@@ -96,8 +96,10 @@ public class BookService {
     public Book createBook(BookInput input) {
         UserDto faculty = getCurrentUser();
 
-        if (!faculty.roles().contains(Role.FACULTY)) {
-            throw new IllegalArgumentException("Only users with the Faculty role can create books");
+        if (!faculty.roles().contains(Role.LIBRARIAN) && 
+            !faculty.roles().contains(Role.ASSISTANT_LIBRARIAN) && 
+            !faculty.roles().contains(Role.SUPER_ADMIN)) {
+            throw new IllegalArgumentException("Only users with Librarian, Assistant Librarian, or Super Admin roles can create books");
         }
 
         if (bookRepository.findByIsbn(input.isbn()).isPresent()) {

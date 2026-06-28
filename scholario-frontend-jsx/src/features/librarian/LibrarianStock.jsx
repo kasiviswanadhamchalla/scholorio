@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -27,29 +28,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Modal } from '../../components/Modal';
 
-const GET_ALL_BOOKS = gql`
-  query GetAllBooks {
-    getAllBooks {
-      id
-      title
-      isbn
-      state {
-        type
-      }
-      createdAt
-    }
-  }
-`;
 
-const CREATE_BOOK = gql`
-  mutation CreateBook($input: BookInput!) {
-    createBook(input: $input) {
-      id
-      title
-      isbn
-    }
-  }
-`;
+
+
 
 export const LibrarianStock = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,8 +40,8 @@ export const LibrarianStock = () => {
   const [isbn, setIsbn] = useState('');
   const [description, setDescription] = useState('');
 
-  const { data, loading, refetch } = useQuery(GET_ALL_BOOKS);
-  const [createBook, { loading: creating }] = useMutation(CREATE_BOOK);
+  const { data, loading, refetch } = useRestQuery('/api/catalog', 'getAllBooks');
+  const [createBook, { loading: creating }] = useRestMutation('/api/catalog', 'POST', 'createBook');
 
   const handleAddStock = async () => {
     if (!title || !isbn) return;

@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState, useEffect } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -22,31 +23,13 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 
-const GET_MY_PROFILE = gql`
-  query GetMyProfile {
-    getMyProfile {
-      id
-      username
-      email
-      fullName
-      roles
-    }
-  }
-`;
 
-const UPDATE_PROFILE = gql`
-  mutation UpdateProfile($input: ProfileInput!) {
-    updateUserProfile(input: $input) {
-      id
-      fullName
-      email
-    }
-  }
-`;
+
+
 
 export const LibrarianSettings = () => {
-  const { data, loading, refetch } = useQuery(GET_MY_PROFILE);
-  const [updateProfile, { loading: updating }] = useMutation(UPDATE_PROFILE);
+  const { data, loading, refetch } = useRestQuery('/api/member/profile', 'getMyProfile');
+  const [updateProfile, { loading: updating }] = useRestMutation('/api/member/profile', 'PUT', 'updateProfile');
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');

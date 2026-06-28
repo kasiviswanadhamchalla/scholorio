@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -33,69 +34,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
-const GET_DEPARTMENTS = gql`
-  query GetDepartments {
-    getDepartments {
-      id
-      name
-      code
-    }
-  }
-`;
 
-const GET_FACULTY_LIST = gql`
-  query GetFacultyList {
-    getFacultyList {
-      id
-      fullName
-      email
-      username
-      department {
-        id
-        name
-      }
-    }
-  }
-`;
 
-const CREATE_DEPARTMENT = gql`
-  mutation CreateDepartment($input: DepartmentInput!) {
-    createDepartment(input: $input) {
-      id
-      name
-      code
-    }
-  }
-`;
 
-const LINK_FACULTY_TO_DEPT = gql`
-  mutation LinkFacultyToDept($facultyId: ID!, $departmentId: ID!) {
-    linkFacultyToDepartment(facultyId: $facultyId, departmentId: $departmentId) {
-      id
-      fullName
-      department {
-        id
-        name
-      }
-    }
-  }
-`;
 
-const UPDATE_DEPARTMENT = gql`
-  mutation UpdateDepartment($id: ID!, $input: DepartmentInput!) {
-    updateDepartment(id: $id, input: $input) {
-      id
-      name
-      code
-    }
-  }
-`;
 
-const DELETE_DEPARTMENT = gql`
-  mutation DeleteDepartment($id: ID!) {
-    deleteDepartment(id: $id)
-  }
-`;
+
+
+
+
+
+
 
 export const DepartmentsManagement = () => {
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
@@ -109,13 +58,13 @@ export const DepartmentsManagement = () => {
   const [selectedFaculty, setSelectedFaculty] = useState('');
   const [selectedDept, setSelectedDept] = useState('');
 
-  const { data: deptData, loading: deptLoading, refetch: refetchDepts } = useQuery(GET_DEPARTMENTS);
-  const { data: facultyData, loading: facultyLoading, refetch: refetchFaculty } = useQuery(GET_FACULTY_LIST);
+  const { data: deptData, loading: deptLoading, refetch: refetchDepts } = useRestQuery('/api/member/departments', 'getDepartments');
+  const { data: facultyData, loading: facultyLoading, refetch: refetchFaculty } = useRestQuery('/api/member/users', 'getFacultyList');
 
-  const [createDept] = useMutation(CREATE_DEPARTMENT);
-  const [updateDept] = useMutation(UPDATE_DEPARTMENT);
-  const [deleteDept] = useMutation(DELETE_DEPARTMENT);
-  const [linkFaculty] = useMutation(LINK_FACULTY_TO_DEPT);
+  const [createDept] = useRestMutation('/api/member/departments', 'POST', 'createDepartment');
+  const [updateDept] = useRestMutation((v) => `/api/member/departments/${v.id}`, 'PUT', 'updateDepartment');
+  const [deleteDept] = useRestMutation((v) => `/api/member/departments/${v.id}`, 'DELETE', 'deleteDepartment');
+  const [linkFaculty] = useRestMutation((v) => `/api/member/users/${v.facultyId}/link-department?departmentId=${v.departmentId}`, 'POST', 'linkFacultyToDepartment');
 
   const handleCreateDept = async () => {
     if (!deptName || !deptCode) return;

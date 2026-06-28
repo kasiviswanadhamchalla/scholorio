@@ -1,6 +1,7 @@
+import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
-import { useLazyQuery, useMutation } from '@apollo/client/react';
+
+
 import { 
   Box, 
   Typography, 
@@ -22,36 +23,16 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Modal } from '../../components/Modal';
 
-const SEARCH_BOOKS = gql`
-  query SearchBooks($title: String, $isbn: String) {
-    searchBooks(title: $title, isbn: $isbn) {
-      id
-      title
-      isbn
-      description
-      state {
-        type
-      }
-    }
-  }
-`;
 
-const RESERVE_BOOK = gql`
-  mutation ReserveBook($bookId: ID!) {
-    reserveBook(bookId: $bookId) {
-      id
-      status
-      reservedAt
-    }
-  }
-`;
+
+
 
 export const StudentSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState(null);
   
   const [searchBooks, { data, loading }] = useLazyQuery(SEARCH_BOOKS);
-  const [reserveBook, { loading: reserving }] = useMutation(RESERVE_BOOK);
+  const [reserveBook, { loading: reserving }] = useRestMutation('/api/lending/request', 'POST', 'reserveBook');
 
   const handleSearch = (e) => {
     e.preventDefault();
