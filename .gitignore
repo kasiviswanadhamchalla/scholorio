@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 .idea
+scholario-postman-collection.json
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
