@@ -10,10 +10,10 @@ import { AdminDashboard } from './features/admin/AdminDashboard';
 import { DepartmentsManagement } from './features/admin/DepartmentsManagement';
 import { SecurityAudit } from './features/admin/SecurityAudit';
 import { AdminSettings } from './features/admin/AdminSettings';
-import { StudentDashboard } from './features/student/StudentDashboard';
-import { StudentSearch } from './features/student/StudentSearch';
-import { StudentCourses } from './features/student/StudentCourses';
-import { StudentSettings } from './features/student/StudentSettings';
+import { MemberDashboard } from './features/member/MemberDashboard';
+import { MemberSearch } from './features/member/MemberSearch';
+import { MemberCourses } from './features/member/MemberCourses';
+import { MemberSettings } from './features/member/MemberSettings';
 import { LibrarianDashboard } from './features/librarian/LibrarianDashboard';
 import { LibrarianStock } from './features/librarian/LibrarianStock';
 import { LibrarianSettings } from './features/librarian/LibrarianSettings';
@@ -74,10 +74,10 @@ const AdminPortal = () => {
 
 const MemberPortal = () => {
   const navItems = [
-    { icon: DashboardIcon, label: 'My Library', to: '/student/dashboard' },
-    { icon: SearchIcon, label: 'Search Books', to: '/student/search' },
-    { icon: SchoolIcon, label: 'My Courses', to: '/student/courses' },
-    { icon: SettingsIcon, label: 'Settings', to: '/student/settings' },
+    { icon: DashboardIcon, label: 'My Library', to: '/member/dashboard' },
+    { icon: SearchIcon, label: 'Search Books', to: '/member/search' },
+    { icon: SchoolIcon, label: 'My Courses', to: '/member/courses' },
+    { icon: SettingsIcon, label: 'Settings', to: '/member/settings' },
   ];
   return (
     <RoleProtectedRoute allowedRoles={['MEMBER']}>
@@ -112,12 +112,12 @@ function App() {
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 
-          <Route path="/student" element={<MemberPortal />}>
+          <Route path="/member" element={<MemberPortal />}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<StudentDashboard />} />
-            <Route path="search" element={<StudentSearch />} />
-            <Route path="courses" element={<StudentCourses />} />
-            <Route path="settings" element={<StudentSettings />} />
+            <Route path="dashboard" element={<MemberDashboard />} />
+            <Route path="search" element={<MemberSearch />} />
+            <Route path="courses" element={<MemberCourses />} />
+            <Route path="settings" element={<MemberSettings />} />
           </Route>
 
           <Route path="/librarian" element={<LibrarianPortal />}>
@@ -141,7 +141,7 @@ const RootRedirect = () => {
   const { role } = useAuth();
   if (role === 'SUPER_ADMIN') return <Navigate to="/admin" replace />;
   if (role === 'LIBRARIAN' || role === 'ASSISTANT_LIBRARIAN') return <Navigate to="/librarian" replace />;
-  if (role === 'MEMBER') return <Navigate to="/student" replace />;
+  if (role === 'MEMBER') return <Navigate to="/member" replace />;
   if (role === 'UNASSIGNED') return <Navigate to="/unassigned" replace />;
   
   return (

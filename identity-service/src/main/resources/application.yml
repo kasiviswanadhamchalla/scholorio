@@ -1,5 +1,5 @@
 spring:
   application:
-    name: member-service
+    name: identity-service
   config:
     import: "optional:configserver:http://localhost:8888"

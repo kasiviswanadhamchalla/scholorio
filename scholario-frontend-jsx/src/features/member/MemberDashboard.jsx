@@ -1,6 +1,6 @@
 import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-
+import axios from 'axios';
 
 import { 
   Box, 
@@ -23,19 +23,31 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import HistoryIcon from '@mui/icons-material/History';
 import SearchIcon from '@mui/icons-material/Search';
 
-
-
-
-
-export const StudentDashboard = () => {
+export const MemberDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { data, loading, error } = useRestQuery('/api/lending/my-issued', 'getMyIssuedBooks');
   
-  const [searchBooks, { data: searchData, loading: searching }] = useLazyQuery(SEARCH_BOOKS);
+  const [searchData, setSearchData] = useState(null);
+  const [searching, setSearching] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (searchTerm.trim()) {
-      searchBooks({ variables: { title: searchTerm } });
+      setSearching(true);
+      try {
+        const token = window.localStorage.getItem('scholario_token') || 'mock-jwt-token-123456';
+        const response = await axios.get('/api/catalog', {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          },
+          params: { title: searchTerm }
+        });
+        setSearchData({ searchBooks: response.data });
+      } catch (err) {
+        console.error('Search error:', err);
+      } finally {
+        setSearching(false);
+      }
     }
   };
 
@@ -220,7 +232,7 @@ export const StudentDashboard = () => {
                 );
               })}
               {!loading && !error && data?.getMyIssuedBooks.length === 0 && (
-                <Box sx={{ p: 6, textValues: 'center', textAlign: 'center' }}>
+                <Box sx={{ p: 6, textAlign: 'center' }}>
                   <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                     No active loans found.
                   </Typography>
@@ -246,12 +258,14 @@ export const StudentDashboard = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Find academic resource..." 
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start" sx={{ color: 'primary.light' }}>
-                        <SearchIcon fontSize="small" />
-                      </InputAdornment>
-                    ),
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ color: 'primary.light' }}>
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      )
+                    }
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {

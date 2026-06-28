@@ -1,7 +1,6 @@
 import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState, useEffect } from 'react';
 
-
 import { 
   Box, 
   Typography, 
@@ -22,11 +21,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-
-
-
-
-export const StudentSettings = () => {
+export const MemberSettings = () => {
   const { data, loading, refetch } = useRestQuery('/api/member/profile', 'getMyProfile');
   const [updateProfile, { loading: updating }] = useRestMutation('/api/member/profile', 'PUT', 'updateProfile');
 
@@ -73,7 +68,7 @@ export const StudentSettings = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pb: 6, maxWidth: 900, mx: 'auto' }}>
       <Box component="header">
         <Typography variant="h4" fontWeight={900} color="text.primary" sx={{ letterSpacing: -1, textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
-          Student Identity Matrix
+          Member Identity Matrix
         </Typography>
         <Typography variant="body2" color="text.secondary" fontWeight={500}>
           Manage your digital footprint and secure node settings
@@ -101,11 +96,11 @@ export const StudentSettings = () => {
                 {profile?.fullName}
               </Typography>
               <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ display: 'block', mt: 0.5, fontFamily: 'monospace', textTransform: 'uppercase' }}>
-                NODE_ID: {profile?.id.substring(0, 8)}
+                NODE_ID: {profile?.id?.toString()?.substring(0, 8) || 'N/A'}
               </Typography>
               <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                 <Chip 
-                  label="Active Student" 
+                  label="Active Member" 
                   size="small" 
                   color="success" 
                   sx={{ fontWeight: 'black', borderRadius: 2, fontSize: 10, py: 1.5 }} 

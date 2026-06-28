@@ -13,6 +13,7 @@ dependencies {
     api libs.org.springframework.boot.spring.boot.starter.validation
     api libs.org.springframework.boot.spring.boot.starter.actuator
     api libs.org.springframework.cloud.spring.cloud.starter.netflix.eureka.client
+    api libs.org.springframework.cloud.spring.cloud.starter.config
     api libs.org.springframework.cloud.spring.cloud.starter.openfeign
     api libs.org.springframework.cloud.spring.cloud.starter.circuitbreaker.resilience4j
     api libs.org.springframework.security.spring.security.oauth2.resource.server

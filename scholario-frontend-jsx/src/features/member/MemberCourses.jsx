@@ -1,7 +1,6 @@
 import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React from 'react';
 
-
 import { 
   Box, 
   Typography, 
@@ -13,9 +12,7 @@ import {
 import SchoolIcon from '@mui/icons-material/School';
 import BookIcon from '@mui/icons-material/Book';
 
-
-
-export const StudentCourses = () => {
+export const MemberCourses = () => {
   const { data: profileData } = useRestQuery('/api/member/profile', 'getMyProfile');
   
   return (
@@ -63,7 +60,7 @@ export const StudentCourses = () => {
                 Enrollment Matrix Pending
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5, maxWidth: 300, mx: 'auto', fontWeight: 500 }}>
-                The digital course registry is being synchronized with your student ID.
+                The digital course registry is being synchronized with your member ID.
               </Typography>
             </CardContent>
           </Card>
