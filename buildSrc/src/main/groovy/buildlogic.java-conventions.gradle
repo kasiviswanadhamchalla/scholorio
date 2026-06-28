@@ -7,6 +7,7 @@ plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
     id 'maven-publish'
+    id 'jacoco'
 }
 
 repositories {
@@ -22,11 +23,20 @@ dependencies {
     
     testCompileOnly 'org.projectlombok:lombok:1.18.40'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.40'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 group = 'com.scholario'
 version = '0.0.1-SNAPSHOT'
-java.sourceCompatibility = JavaVersion.VERSION_21
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 publishing {
     publications {
@@ -37,9 +47,24 @@ publishing {
 }
 
 tasks.withType(JavaCompile) {
+    options.release = 21
     options.encoding = 'UTF-8'
 }
 
 tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
 }
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
