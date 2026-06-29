@@ -17,73 +17,73 @@ spring:
         - id: book-service-route
           uri: lb://book-service
           predicates:
-            - Path=/api/catalog/**
+            - Path=/api/catalog,/api/catalog/**
           filters:
             - StripPrefix=2
         - id: lending-service-route
           uri: lb://lending-service
           predicates:
-            - Path=/api/lending/**
+            - Path=/api/lending,/api/lending/**
           filters:
             - StripPrefix=2
         - id: identity-service-route
           uri: lb://identity-service
           predicates:
-            - Path=/api/member/**
+            - Path=/api/member,/api/member/**
           filters:
             - StripPrefix=2
         - id: notification-service-route
           uri: lb://notification-service
           predicates:
-            - Path=/api/notification/**
+            - Path=/api/notification,/api/notification/**
           filters:
             - StripPrefix=2
         - id: course-service-route
           uri: lb://course-service
           predicates:
-            - Path=/api/course/**
+            - Path=/api/course,/api/course/**
           filters:
             - StripPrefix=2
         - id: approval-service-route
           uri: lb://approval-service
           predicates:
-            - Path=/api/approval/**
+            - Path=/api/approval,/api/approval/**
           filters:
             - StripPrefix=2
         - id: royalty-service-route
           uri: lb://royalty-service
           predicates:
-            - Path=/api/royalty/**
+            - Path=/api/royalty,/api/royalty/**
           filters:
             - StripPrefix=2
         - id: digital-content-service-route
           uri: lb://digital-content-service
           predicates:
-            - Path=/api/digital/**
+            - Path=/api/digital,/api/digital/**
           filters:
             - StripPrefix=2
         - id: search-service-route
           uri: lb://search-service
           predicates:
-            - Path=/api/search/**
+            - Path=/api/search,/api/search/**
           filters:
             - StripPrefix=2
         - id: analytics-service-route
           uri: lb://analytics-service
           predicates:
-            - Path=/api/analytics/**
+            - Path=/api/analytics,/api/analytics/**
           filters:
             - StripPrefix=2
         - id: audit-service-route
           uri: lb://audit-service
           predicates:
-            - Path=/api/audit/**
+            - Path=/api/audit,/api/audit/**
           filters:
             - StripPrefix=2
         - id: reservation-service-route
           uri: lb://reservation-service
           predicates:
-            - Path=/api/reservation/**
+            - Path=/api/reservation,/api/reservation/**
           filters:
             - StripPrefix=2
         # Backwards compatibility routes

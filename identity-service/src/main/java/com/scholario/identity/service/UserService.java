@@ -146,8 +146,36 @@ public class UserService {
     }
 
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND + ": " + username));
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        }
+
+        log.info("User {} not found in local database. Attempting to look up and sync from Keycloak...", username);
+        try {
+            org.keycloak.representations.idm.UserRepresentation userRep = keycloakRoleSyncService.getUserFromKeycloak(username);
+            if (userRep != null) {
+                String email = userRep.getEmail();
+                String firstName = userRep.getFirstName();
+                String lastName = userRep.getLastName();
+                String fullName = (firstName != null ? firstName : "") + (lastName != null ? " " + lastName : "");
+                fullName = fullName.trim();
+                if (fullName.isEmpty()) {
+                    fullName = username;
+                }
+                List<String> roles = keycloakRoleSyncService.getUserRolesFromKeycloak(username, userRep.getId());
+                
+                log.info("Found user {} in Keycloak with roles: {}. Synchronizing to local database...", username, roles);
+                syncUserFromExternalProvider(username, email, fullName, roles);
+                
+                return userRepository.findByUsername(username)
+                        .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND + ": " + username));
+            }
+        } catch (Exception e) {
+            log.error("Failed to dynamically sync user {} from Keycloak: {}", username, e.getMessage(), e);
+        }
+
+        throw new IllegalArgumentException(USER_NOT_FOUND + ": " + username);
     }
 
     public boolean existsUser(Long id) {

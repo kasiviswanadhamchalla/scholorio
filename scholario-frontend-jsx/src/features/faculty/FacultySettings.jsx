@@ -82,8 +82,8 @@ export const FacultySettings = () => {
 
       <Grid container spacing={4}>
         {/* Left Side Info Cards */}
-        <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', textAlign: 'center', p: 1 }}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', textAlign: 'center', p: 1 }}>
             <CardContent sx={{ py: 4 }}>
               <Avatar 
                 sx={{ 
@@ -104,7 +104,7 @@ export const FacultySettings = () => {
                 @{profile?.username}
               </Typography>
               
-              <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 3.5, border: '1px solid', borderColor: 'grey.100', textAlign: 'left' }}>
+              <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1.5, border: '1px solid', borderColor: 'grey.100', textAlign: 'left' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, color: 'text.disabled' }}>
                   <SchoolIcon sx={{ fontSize: 14 }} />
                   <Typography variant="caption" fontWeight="black" sx={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 9 }}>
@@ -121,7 +121,7 @@ export const FacultySettings = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ borderRadius: 5, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
+          <Card sx={{ borderRadius: 2, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, color: 'grey.400' }}>
                 <ShieldIcon fontSize="small" />
@@ -153,9 +153,9 @@ export const FacultySettings = () => {
         </Grid>
 
         {/* Right Side Settings Form */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Box component="form" onSubmit={handleUpdate} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+            <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
               <Box sx={{ px: 3, py: 2.5, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'grey.50' }}>
                 <SettingsIcon color="action" />
                 <Typography variant="subtitle2" fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -179,7 +179,7 @@ export const FacultySettings = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 3.5,
+                        borderRadius: 1.5,
                         bgcolor: 'grey.50',
                         fontWeight: 600,
                         fontSize: 14,
@@ -208,7 +208,7 @@ export const FacultySettings = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 3.5,
+                        borderRadius: 1.5,
                         bgcolor: 'grey.50',
                         fontWeight: 600,
                         fontSize: 14,
@@ -245,7 +245,7 @@ export const FacultySettings = () => {
                     disabled={updating}
                     startIcon={updating ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
                     sx={{ 
-                      borderRadius: 3.5, 
+                      borderRadius: 2, 
                       textTransform: 'uppercase', 
                       fontWeight: 'bold', 
                       fontSize: 11, 
@@ -262,7 +262,7 @@ export const FacultySettings = () => {
             </Card>
 
             {/* Security Box */}
-            <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+            <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
               <CardContent sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50', color: 'text.disabled', display: 'flex' }}>
@@ -277,7 +277,7 @@ export const FacultySettings = () => {
                     </Typography>
                   </Box>
                 </Box>
-                <Button variant="outlined" sx={{ borderRadius: 3, textTransform: 'uppercase', fontWeight: 800, fontSize: 10, letterSpacing: 1, py: 1.25, px: 3, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main', bgcolor: 'transparent' } }}>
+                <Button variant="outlined" sx={{ borderRadius: 2, textTransform: 'uppercase', fontWeight: 800, fontSize: 10, letterSpacing: 1, py: 1.25, px: 3, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main', bgcolor: 'transparent' } }}>
                   Change Password
                 </Button>
               </CardContent>

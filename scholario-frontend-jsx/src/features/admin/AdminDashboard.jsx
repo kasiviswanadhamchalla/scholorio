@@ -39,6 +39,9 @@ import BusinessIcon from '@mui/icons-material/Business';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import PersonIcon from '@mui/icons-material/Person';
 import { Modal } from '../../components/Modal';
 import { CustomSelect } from '../../components/CustomSelect';
 
@@ -50,14 +53,33 @@ import { CustomSelect } from '../../components/CustomSelect';
 
 
 
+const parseDate = (d) => {
+  if (!d) return 'N/A';
+  if (Array.isArray(d)) {
+    const [year, month, day, hour = 0, minute = 0, second = 0] = d;
+    return new Date(year, month - 1, day, hour, minute, second).toLocaleDateString();
+  }
+  const date = new Date(d);
+  return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
+};
+
 const StatCard = ({ icon: Icon, label, value, color, bg }) => (
-  <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
-    <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, '&:last-child': { pb: 2.5 } }}>
-      <Box sx={{ p: 1.5, borderRadius: 2.5, bgcolor: bg, color: color, display: 'flex' }}>
+  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', width: '100%' }}>
+    <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, '&:last-child': { pb: 2.5 } }}>
+      <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: bg, color: color, display: 'flex', flexShrink: 0 }}>
         <Icon sx={{ fontSize: 24 }} />
       </Box>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: 1, display: 'block', noWrap: true }}>
+      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+        <Typography 
+          variant="caption" 
+          fontWeight="bold" 
+          color="text.disabled" 
+          sx={{ 
+            textTransform: 'uppercase', 
+            letterSpacing: 1, 
+            display: 'block'
+          }}
+        >
           {label}
         </Typography>
         <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mt: 0.25, letterSpacing: -0.5, lineHeight: 1.2 }}>
@@ -77,8 +99,7 @@ export const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
 
-  const { data, loading, error } = useRestQuery('/api/member/users', 'getViolationReports');
-  const { data: allUsersData, loading: usersLoading } = useRestQuery('/api/member/users', 'getAllUsers');
+  const { data: allUsersData, loading: usersLoading, error: usersError, refetch: refetchUsers } = useRestQuery('/api/member/users', 'getAllUsers');
   const { data: unassignedData, refetch: refetchUnassigned } = useRestQuery('/api/member/unassigned', 'getUnassignedUsers');
 
   const [assignRole] = useRestMutation((v) => `/api/member/users/${v.userId}/assign-role?role=${v.role}`, 'POST', 'assignRole');
@@ -91,19 +112,20 @@ export const AdminDashboard = () => {
       setSelectedUser('');
       setSelectedRole('');
       refetchUnassigned();
+      refetchUsers();
       alert('Role assigned successfully');
     } catch (err) {
       console.error('Failed to assign role:', err);
     }
   };
 
-  if (error) {
+  if (usersError) {
     return (
       <Alert 
         severity="error" 
         icon={<ShieldIcon sx={{ fontSize: 24 }} />}
         sx={{ 
-          borderRadius: 4, 
+          borderRadius: 2, 
           bgcolor: 'error.lighter', 
           color: 'error.dark',
           border: '1px solid',
@@ -115,31 +137,33 @@ export const AdminDashboard = () => {
           SYSTEM_ERROR_LINK_FAILURE
         </Typography>
         <Typography variant="body2" sx={{ fontSize: 13, fontWeight: 500 }}>
-          Unable to synchronize with telemetry nodes. Infrastructure monitoring offline.
+          Unable to synchronize with identity database. Member directory offline.
         </Typography>
       </Alert>
     );
   }
 
-  const pendingViolations = data?.getViolationReports.filter(v => !v.resolved).length || 0;
-  const criticalViolations = data?.getViolationReports.filter(v => v.severity === 'CRITICAL').length || 0;
-  const totalEntities = allUsersData?.getAllUsers.length || 0;
+  const users = allUsersData?.getAllUsers || [];
+  const totalUsers = users.length;
+  const librarianCount = users.filter(u => u.roles.includes('LIBRARIAN') || u.roles.includes('ASSISTANT_LIBRARIAN')).length;
+  const memberCount = users.filter(u => u.roles.includes('MEMBER')).length;
+  const unassignedCount = users.filter(u => u.roles.includes('UNASSIGNED')).length;
 
   const userOptions = unassignedData?.getUnassignedUsers.map(u => ({ id: u.id, name: `${u.fullName} (@${u.username})` })) || [];
   const roleOptions = [
-    { id: 'ADMIN', name: 'Administrator' },
-    { id: 'FACULTY', name: 'Faculty' },
-    { id: 'STUDENT', name: 'Student' },
+    { id: 'SUPER_ADMIN', name: 'Administrator' },
     { id: 'LIBRARIAN', name: 'Librarian' },
+    { id: 'ASSISTANT_LIBRARIAN', name: 'Assistant Librarian' },
+    { id: 'MEMBER', name: 'Member' }
   ];
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       {/* Header */}
-      <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
-        <CardContent sx={{ p: { xs: 3, sm: 4 }, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 3 }}>
+      <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+        <CardContent sx={{ p: { xs: 3, sm: 4 }, '&:last-child': { pb: { xs: 3, sm: 4 } }, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1.5, bgcolor: 'grey.900', color: 'white', borderRadius: 3, display: 'flex' }}>
+            <Box sx={{ p: 1.5, bgcolor: 'grey.900', color: 'white', borderRadius: 1.5, display: 'flex' }}>
               <AnalyticsIcon sx={{ fontSize: 24 }} />
             </Box>
             <Box>
@@ -152,22 +176,22 @@ export const AdminDashboard = () => {
                   size="small" 
                   color="success" 
                   sx={{ 
-                    borderRadius: 2, 
+                    borderRadius: 1, 
                     fontWeight: 'black', 
                     fontSize: 9, 
                     height: 16,
                     px: 0.5,
-                    '& .MuiChip-label': { px: 1 }
+                    '& .MuiChip-label': { px: 1}
                   }} 
                 />
               </Box>
-              <Typography variant="body2" color="text.secondary" fontWeight="bold" sx={{ fontFamily: 'monospace', fontSize: 11, mt: 0.25 }}>
+              {/* <Typography variant="body2" color="text.secondary" fontWeight="bold" sx={{ fontFamily: 'monospace', fontSize: 11, mt: 0.25 }}>
                 Node ID: SCHOLARIO-PRD-01 // Global Oversight Mode
-              </Typography>
+              </Typography> */}
             </Box>
           </Box>
           
-          <Button 
+          {/* <Button 
             variant="contained" 
             color="error"
             startIcon={<LockIcon />}
@@ -185,125 +209,96 @@ export const AdminDashboard = () => {
             }}
           >
             Emergency Lockdown
-          </Button>
+          </Button> */}
         </CardContent>
       </Card>
 
       {/* Metrics Row */}
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard icon={ShieldIcon} label="Security Violations" value={loading ? '...' : data?.getViolationReports.length || 0} color="#334155" bg="#f1f5f9" />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ display: 'flex' }}>
+          <StatCard icon={PersonIcon} label="Total Registered Users" value={usersLoading ? '...' : totalUsers} color="#1e293b" bg="#f8fafc" />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard icon={AccessTimeIcon} label="Pending Investigation" value={loading ? '...' : pendingViolations} color="#d97706" bg="#fef3c7" />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ display: 'flex' }}>
+          <StatCard icon={LocalLibraryIcon} label="Librarians" value={usersLoading ? '...' : librarianCount} color="#15803d" bg="#f0fdf4" />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard icon={WarningIcon} label="Critical Alerts" value={loading ? '...' : criticalViolations} color="#e11d48" bg="#ffe4e6" />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ display: 'flex' }}>
+          <StatCard icon={PeopleIcon} label="Members" value={usersLoading ? '...' : memberCount} color="#0284c7" bg="#e0f2fe" />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard icon={PeopleIcon} label="Global Entities" value={usersLoading ? '...' : totalEntities} color="#0284c7" bg="#e0f2fe" />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ display: 'flex' }}>
+          <StatCard icon={LockOpenIcon} label="Unassigned Registrations" value={usersLoading ? '...' : unassignedCount} color="#d97706" bg="#fef3c7" />
         </Grid>
       </Grid>
 
       {/* Split Views */}
       <Grid container spacing={4}>
-        {/* Table of violations */}
+        {/* Table of Registered Users */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
             <Box sx={{ px: 3, py: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50' }}>
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                Security Violations Engine
+                Registered User Directory
               </Typography>
-              <Button 
-                component={Link}
-                to="/admin/security"
-                endIcon={<ChevronRightIcon />}
-                sx={{ 
-                  color: 'text.secondary', 
-                  fontSize: 10, 
-                  fontWeight: 800, 
-                  letterSpacing: 1.2,
-                  textTransform: 'uppercase',
-                  '&:hover': { bgcolor: 'transparent', color: 'text.primary' }
-                }}
-              >
-                Full Audit Log
-              </Button>
             </Box>
             
             <TableContainer>
               <Table sx={{ minWidth: 600 }}>
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                   <TableRow sx={{ '& th': { fontSize: 10, fontWeight: 'black', color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1.2 } }}>
-                    <TableCell sx={{ pl: 4 }}>Subject</TableCell>
-                    <TableCell>Priority</TableCell>
-                    <TableCell>Metric</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell align="right" sx={{ pr: 4 }}>Ops</TableCell>
+                    <TableCell sx={{ pl: 4 }}>User Entity</TableCell>
+                    <TableCell>Username</TableCell>
+                    <TableCell>Authorization Tier</TableCell>
+                    <TableCell>Registration Date</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody sx={{ fontFamily: 'monospace' }}>
-                  {loading ? (
+                  {usersLoading ? (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                      <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
                         <CircularProgress size={24} />
                       </TableCell>
                     </TableRow>
-                  ) : data?.getViolationReports.length === 0 ? (
+                  ) : users.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} align="center" sx={{ py: 6, fontStyle: 'italic', color: 'text.secondary' }}>
-                        Zero Violations Detected
+                      <TableCell colSpan={4} align="center" sx={{ py: 6, fontStyle: 'italic', color: 'text.secondary' }}>
+                        No Registered Users Found
                       </TableCell>
                     </TableRow>
-                  ) : data?.getViolationReports.slice(0, 5).map((v) => (
-                    <TableRow key={v.id} sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
-                      <TableCell sx={{ pl: 4, py: 2, fontBold: true, fontWeight: 'bold', color: 'text.primary', fontFamily: 'sans-serif', fontSize: 13 }}>
-                        {v.username}
+                  ) : users.map((u) => (
+                    <TableRow key={u.id} sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
+                      <TableCell sx={{ pl: 4, py: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ fontFamily: 'sans-serif', fontSize: 13 }}>
+                            {u.fullName}
+                          </Typography>
+                          <Typography variant="caption" color="text.disabled" sx={{ fontSize: 10, fontFamily: 'sans-serif' }}>
+                            {u.email}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 12, color: 'text.secondary', fontWeight: 500, fontFamily: 'sans-serif' }}>
+                        @{u.username}
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                          label={v.severity} 
-                          size="small" 
-                          color={v.severity === 'CRITICAL' ? 'error' : v.severity === 'HIGH' ? 'warning' : 'default'}
-                          sx={{ 
-                            borderRadius: 1, 
-                            fontWeight: 'bold', 
-                            fontSize: 9, 
-                            height: 18,
-                            textTransform: 'uppercase'
-                          }} 
-                        />
+                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                          {u.roles.map((role) => (
+                            <Chip 
+                              key={role}
+                              label={role} 
+                              size="small" 
+                              color={role === 'SUPER_ADMIN' ? 'error' : role === 'LIBRARIAN' ? 'success' : role === 'MEMBER' ? 'primary' : 'default'}
+                              sx={{ 
+                                borderRadius: 1, 
+                                fontWeight: 'black', 
+                                fontSize: 8, 
+                                height: 18,
+                                textTransform: 'uppercase'
+                              }} 
+                            />
+                          ))}
+                        </Box>
                       </TableCell>
-                      <TableCell sx={{ fontSize: 12, color: 'text.secondary', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {v.description}
-                      </TableCell>
-                      <TableCell>
-                        {v.resolved ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: 'success.main' }}>
-                            <CheckCircleIcon sx={{ fontSize: 14 }} />
-                            <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', fontSize: 9 }}>Resolved</Typography>
-                          </Box>
-                        ) : (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: 'warning.main' }}>
-                            <AccessTimeIcon sx={{ fontSize: 14 }} />
-                            <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', fontSize: 9 }}>Pending</Typography>
-                          </Box>
-                        )}
-                      </TableCell>
-                      <TableCell align="right" sx={{ pr: 4 }}>
-                        <Button 
-                          onClick={() => navigate('/admin/security')}
-                          sx={{ 
-                            fontSize: 10, 
-                            fontWeight: 'black', 
-                            textTransform: 'uppercase',
-                            p: 0,
-                            minWidth: 0,
-                            '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
-                          }}
-                        >
-                          Investigate
-                        </Button>
+                      <TableCell sx={{ fontSize: 11, color: 'text.secondary', fontWeight: 500, fontFamily: 'sans-serif' }}>
+                        {parseDate(u.createdAt)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -315,7 +310,7 @@ export const AdminDashboard = () => {
 
         {/* Side panels */}
         <Grid size={{ xs: 12, lg: 4 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <LockIcon color="action" fontSize="small" />
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -330,7 +325,7 @@ export const AdminDashboard = () => {
                     onClick={() => navigate('/admin/departments')}
                     sx={{ 
                       p: 2, 
-                      borderRadius: 3.5, 
+                      borderRadius: 2, 
                       border: '1px solid', 
                       borderColor: 'grey.100',
                       '&:hover': { borderColor: 'primary.main', bgcolor: 'transparent', '& .MuiSvgIcon-root': { color: 'primary.main' } } 
@@ -359,7 +354,7 @@ export const AdminDashboard = () => {
                     onClick={() => setIsRoleModalOpen(true)}
                     sx={{ 
                       p: 2, 
-                      borderRadius: 3.5, 
+                      borderRadius: 2, 
                       border: '1px solid', 
                       borderColor: 'grey.100',
                       '&:hover': { borderColor: 'primary.main', bgcolor: 'transparent', '& .MuiSvgIcon-root': { color: 'primary.main' } } 
@@ -394,7 +389,7 @@ export const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ bgcolor: 'grey.900', color: 'white', borderRadius: 4, p: 1 }}>
+          {/* <Card sx={{ bgcolor: 'grey.900', color: 'white', borderRadius: 2, p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'error.light' }}>
                 <ShieldIcon fontSize="small" />
@@ -408,7 +403,7 @@ export const AdminDashboard = () => {
                 [STABLE] Connection: Global Telemetry
               </Typography>
             </CardContent>
-          </Card>
+          </Card> */}
         </Grid>
       </Grid>
 
@@ -441,7 +436,7 @@ export const AdminDashboard = () => {
             variant="contained"
             sx={{ 
               py: 1.5, 
-              borderRadius: 3.5, 
+              borderRadius: 2, 
               bgcolor: 'primary.main', 
               color: 'white',
               fontWeight: 'bold', 
@@ -477,7 +472,7 @@ export const AdminDashboard = () => {
                 fullWidth
                 variant="outlined"
                 onClick={() => setIsLockdownModalOpen(false)}
-                sx={{ py: 1.5, borderRadius: 3, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 11, borderColor: 'divider', color: 'text.secondary' }}
+                sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 11, borderColor: 'divider', color: 'text.secondary' }}
               >
                 Abort
               </Button>
@@ -488,7 +483,7 @@ export const AdminDashboard = () => {
                 variant="contained"
                 color="error"
                 onClick={() => { alert('LOCKDOWN_EXECUTED'); setIsLockdownModalOpen(false); }}
-                sx={{ py: 1.5, borderRadius: 3, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 11 }}
+                sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 11 }}
               >
                 Confirm Lockdown
               </Button>

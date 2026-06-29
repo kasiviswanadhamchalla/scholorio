@@ -43,9 +43,9 @@ import { CustomSelect } from '../../components/CustomSelect';
 
 
 const StatCard = ({ icon: Icon, label, value, color, bg }) => (
-  <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+  <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
     <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2.5, '&:last-child': { pb: 3 } }}>
-      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: bg, color: color, display: 'flex' }}>
+      <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: bg, color: color, display: 'flex' }}>
         <Icon sx={{ fontSize: 28 }} />
       </Box>
       <Box>
@@ -115,7 +115,7 @@ export const FacultyDashboard = () => {
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'flex-end' }, gap: 2 }}>
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-            <Box sx={{ p: 1, bgcolor: 'primary.main', color: 'white', borderRadius: 2.5, display: 'flex' }}>
+            <Box sx={{ p: 1, bgcolor: 'primary.main', color: 'white', borderRadius: 1.5, display: 'flex' }}>
               <DashboardIcon sx={{ fontSize: 20 }} />
             </Box>
             <Typography variant="h5" fontWeight={900} color="text.primary" sx={{ letterSpacing: -0.5, textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
@@ -132,7 +132,7 @@ export const FacultyDashboard = () => {
           startIcon={<AddCircleIcon />}
           onClick={() => setIsModalOpen(true)}
           sx={{ 
-            borderRadius: 3.5, 
+            borderRadius: 2, 
             py: 1.25, 
             px: 3, 
             bgcolor: 'grey.900', 
@@ -168,7 +168,7 @@ export const FacultyDashboard = () => {
       <Grid container spacing={4}>
         {/* Activity log */}
         <Grid item xs={12} lg={8}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'grey.50', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="subtitle2" fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: 1.2, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <AccessTimeIcon color="primary" fontSize="small" /> Recent Activity Registry
@@ -189,7 +189,7 @@ export const FacultyDashboard = () => {
             
             <Box sx={{ p: 2.5 }}>
               {notifications.length === 0 ? (
-                <Box sx={{ py: 6, textAlign: 'center', bgcolor: 'grey.50', border: '1px dashed', borderColor: 'divider', borderRadius: 3 }}>
+                <Box sx={{ py: 6, textAlign: 'center', bgcolor: 'grey.50', border: '1px dashed', borderColor: 'divider', borderRadius: 1.5 }}>
                   <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>
                     No recent activity detected
                   </Typography>
@@ -208,7 +208,7 @@ export const FacultyDashboard = () => {
                       <ListItemButton 
                         sx={{ 
                           p: 2, 
-                          borderRadius: 3.5, 
+                          borderRadius: 2, 
                           bgcolor: 'grey.50', 
                           border: '1px solid', 
                           borderColor: 'grey.100',
@@ -219,7 +219,7 @@ export const FacultyDashboard = () => {
                         }}
                       >
                         <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'white', border: '1px solid', borderColor: 'grey.200', color: 'text.secondary', display: 'flex' }}>
+                          <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: 'white', border: '1px solid', borderColor: 'grey.200', color: 'text.secondary', display: 'flex' }}>
                             {notif.type === 'BOOK' ? <BookIcon fontSize="small" /> : <WarningIcon fontSize="small" />}
                           </Box>
                         </ListItemIcon>
@@ -241,7 +241,7 @@ export const FacultyDashboard = () => {
 
         {/* Right side links */}
         <Grid item xs={12} lg={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Card sx={{ bgcolor: 'grey.900', color: 'white', borderRadius: 4, p: 1 }}>
+          <Card sx={{ bgcolor: 'grey.900', color: 'white', borderRadius: 2, p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
               <Typography variant="caption" fontWeight="bold" sx={{ display: 'block', color: 'grey.500', textTransform: 'uppercase', letterSpacing: 1.5, mb: 2 }}>
                 Infrastructure Hub
@@ -264,7 +264,7 @@ export const FacultyDashboard = () => {
                       py: 2,
                       px: 2.5,
                       bgcolor: 'grey.800',
-                      borderRadius: 3.5,
+                      borderRadius: 2,
                       color: 'grey.300',
                       fontWeight: 700,
                       fontSize: 11,
@@ -287,7 +287,7 @@ export const FacultyDashboard = () => {
             severity="info" 
             icon={<WarningIcon fontSize="small" />}
             sx={{ 
-              borderRadius: 4, 
+              borderRadius: 2, 
               bgcolor: 'primary.lighter', 
               color: 'primary.dark',
               border: '1px solid',
@@ -325,7 +325,7 @@ export const FacultyDashboard = () => {
               placeholder="e.g. Advanced Quantum Mechanics"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   bgcolor: 'grey.50',
                   fontWeight: 600,
                   fontSize: 14,
@@ -349,7 +349,7 @@ export const FacultyDashboard = () => {
                   placeholder="978-..."
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 3,
+                      borderRadius: 1.5,
                       bgcolor: 'grey.50',
                       fontWeight: 600,
                       fontSize: 14,
@@ -384,7 +384,7 @@ export const FacultyDashboard = () => {
               placeholder="Module summary and publication scope..."
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   bgcolor: 'grey.50',
                   fontWeight: 500,
                   fontSize: 14,
@@ -402,7 +402,7 @@ export const FacultyDashboard = () => {
               py: 1.5,
               bgcolor: 'grey.900',
               color: 'white',
-              borderRadius: 3,
+              borderRadius: 2,
               fontWeight: 'bold',
               fontSize: 12,
               textTransform: 'uppercase',

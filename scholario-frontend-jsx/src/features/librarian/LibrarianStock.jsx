@@ -1,6 +1,6 @@
 import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
-
+import axios from 'axios';
 
 import { 
   Box, 
@@ -18,7 +18,9 @@ import {
   Chip,
   IconButton,
   CircularProgress,
-  Alert
+  Alert,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import BookIcon from '@mui/icons-material/Book';
 import AddIcon from '@mui/icons-material/Add';
@@ -27,6 +29,24 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Modal } from '../../components/Modal';
+
+const parseDate = (d) => {
+  if (!d) return 'N/A';
+  if (Array.isArray(d)) {
+    const [year, month, day, hour = 0, minute = 0, second = 0] = d;
+    return new Date(year, month - 1, day, hour, minute, second).toLocaleDateString();
+  }
+  const date = new Date(d);
+  return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
+};
+
+const getHeaders = () => {
+  const token = window.localStorage.getItem('scholario_token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : '',
+  };
+};
 
 
 
@@ -40,8 +60,118 @@ export const LibrarianStock = () => {
   const [isbn, setIsbn] = useState('');
   const [description, setDescription] = useState('');
 
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [activeBook, setActiveBook] = useState(null);
+  const [activeReviewRequestId, setActiveReviewRequestId] = useState(null);
+
   const { data, loading, refetch } = useRestQuery('/api/catalog', 'getAllBooks');
   const [createBook, { loading: creating }] = useRestMutation('/api/catalog', 'POST', 'createBook');
+  const [publishBook] = useRestMutation((v) => `/api/catalog/${v.id}/publish`, 'POST', 'publishBook');
+  const [archiveBook] = useRestMutation((v) => `/api/catalog/${v.id}/archive`, 'POST', 'archiveBook');
+  const [submitForReview] = useRestMutation((v) => `/api/catalog/${v.id}/submit-review`, 'POST', 'submitForReview');
+  const [deleteBook] = useRestMutation((v) => `/api/catalog/${v.id}`, 'DELETE', 'deleteBook');
+
+  const handleOpenMenu = async (event, book) => {
+    setMenuAnchor(event.currentTarget);
+    setActiveBook(book);
+    if (book.state?.type === 'REVIEW') {
+      try {
+        const response = await axios.get(`/api/approval/status/${book.id}`, {
+          headers: getHeaders()
+        });
+        if (response.data) {
+          setActiveReviewRequestId(response.data.id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch review status:', err);
+      }
+    }
+  };
+
+  const handleCloseMenu = () => {
+    setMenuAnchor(null);
+    setActiveBook(null);
+    setActiveReviewRequestId(null);
+  };
+
+  const handlePublish = async () => {
+    if (!activeBook) return;
+    try {
+      await publishBook({ variables: { id: activeBook.id } });
+      refetch();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      handleCloseMenu();
+    }
+  };
+
+  const handleArchive = async () => {
+    if (!activeBook) return;
+    try {
+      await archiveBook({ variables: { id: activeBook.id } });
+      refetch();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      handleCloseMenu();
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!activeBook) return;
+    try {
+      await submitForReview({ variables: { id: activeBook.id } });
+      refetch();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      handleCloseMenu();
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!activeReviewRequestId) return;
+    try {
+      await axios.post(`/api/approval/${activeReviewRequestId}/approve?feedback=Approved by Librarian`, {}, {
+        headers: getHeaders()
+      });
+      refetch();
+    } catch (err) {
+      console.error('Failed to approve book:', err);
+    } finally {
+      handleCloseMenu();
+    }
+  };
+
+  const handleReject = async () => {
+    if (!activeReviewRequestId) return;
+    const feedback = window.prompt("Enter rejection feedback:");
+    if (feedback === null) return;
+    try {
+      await axios.post(`/api/approval/${activeReviewRequestId}/reject?feedback=${encodeURIComponent(feedback || 'Rejected')}`, {}, {
+        headers: getHeaders()
+      });
+      refetch();
+    } catch (err) {
+      console.error('Failed to reject book:', err);
+    } finally {
+      handleCloseMenu();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!activeBook) return;
+    if (!window.confirm(`Are you sure you want to delete "${activeBook.title}"?`)) return;
+    try {
+      await deleteBook({ variables: { id: activeBook.id } });
+      refetch();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      handleCloseMenu();
+    }
+  };
 
   const handleAddStock = async () => {
     if (!title || !isbn) return;
@@ -84,7 +214,7 @@ export const LibrarianStock = () => {
           startIcon={<AddIcon />}
           onClick={() => setIsStockModalOpen(true)}
           sx={{ 
-            borderRadius: 3.5, 
+            borderRadius: 2, 
             py: 1.25, 
             px: 3, 
             bgcolor: 'grey.900', 
@@ -119,7 +249,7 @@ export const LibrarianStock = () => {
           sx={{
             flexGrow: 1,
             '& .MuiOutlinedInput-root': {
-              borderRadius: 3.5,
+              borderRadius: 1.5,
               bgcolor: 'white',
               fontSize: 14,
               '& fieldset': { borderColor: 'divider' },
@@ -131,7 +261,7 @@ export const LibrarianStock = () => {
           variant="outlined" 
           startIcon={<FilterListIcon />}
           sx={{ 
-            borderRadius: 3.5, 
+            borderRadius: 2, 
             fontWeight: 'bold', 
             py: 1.25, 
             px: 3,
@@ -150,7 +280,7 @@ export const LibrarianStock = () => {
       </Box>
 
       {/* Table Section */}
-      <TableContainer component={Paper} sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
         <Table sx={{ minWidth: 650 }}>
           <TableHead sx={{ bgcolor: 'grey.50' }}>
             <TableRow sx={{ '& th': { fontSize: 10, fontWeight: 'black', color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1.2 } }}>
@@ -183,7 +313,7 @@ export const LibrarianStock = () => {
               <TableRow key={book.id} sx={{ '&:hover': { bgcolor: 'grey.50' } }}>
                 <TableCell sx={{ pl: 4, py: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200', color: 'text.secondary', display: 'flex' }}>
+                    <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200', color: 'text.secondary', display: 'flex' }}>
                       <BookIcon fontSize="small" />
                     </Box>
                     <Typography variant="body2" fontWeight="bold" color="text.primary" sx={{ fontFamily: 'sans-serif' }}>
@@ -207,10 +337,14 @@ export const LibrarianStock = () => {
                   />
                 </TableCell>
                 <TableCell sx={{ fontSize: 11, color: 'text.secondary', fontWeight: 500 }}>
-                  {new Date(book.createdAt).toLocaleDateString()}
+                  {parseDate(book.createdAt)}
                 </TableCell>
                 <TableCell align="right" sx={{ pr: 4 }}>
-                  <IconButton size="small" sx={{ borderRadius: 2 }}>
+                  <IconButton 
+                    size="small" 
+                    sx={{ borderRadius: 1 }}
+                    onClick={(e) => handleOpenMenu(e, book)}
+                  >
                     <MoreVertIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </TableCell>
@@ -219,6 +353,77 @@ export const LibrarianStock = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Row Ops Actions Menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleCloseMenu}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 2,
+              mt: 0.5,
+              minWidth: 180,
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
+              border: '1px solid',
+              borderColor: 'divider',
+              p: 0.5
+            }
+          }
+        }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        {activeBook?.state?.type === 'DRAFT' && (
+          <MenuItem 
+            onClick={handlePublish}
+            sx={{ borderRadius: 1.5, fontSize: 12, fontWeight: 600, py: 1, px: 1.5 }}
+          >
+            Publish Resource
+          </MenuItem>
+        )}
+        {activeBook?.state?.type === 'DRAFT' && (
+          <MenuItem 
+            onClick={handleSubmitReview}
+            sx={{ borderRadius: 1.5, fontSize: 12, fontWeight: 600, py: 1, px: 1.5 }}
+          >
+            Submit for Review
+          </MenuItem>
+        )}
+        {activeBook?.state?.type === 'PUBLISHED' && (
+          <MenuItem 
+            onClick={handleArchive}
+            sx={{ borderRadius: 1.5, fontSize: 12, fontWeight: 600, py: 1, px: 1.5 }}
+          >
+            Archive Resource
+          </MenuItem>
+        )}
+        {activeBook?.state?.type === 'REVIEW' && (
+          <MenuItem 
+            onClick={handleApprove}
+            disabled={!activeReviewRequestId}
+            sx={{ borderRadius: 1.5, fontSize: 12, fontWeight: 600, py: 1, px: 1.5 }}
+          >
+            Approve Resource
+          </MenuItem>
+        )}
+        {activeBook?.state?.type === 'REVIEW' && (
+          <MenuItem 
+            onClick={handleReject}
+            disabled={!activeReviewRequestId}
+            sx={{ borderRadius: 1.5, fontSize: 12, fontWeight: 600, py: 1, px: 1.5, color: 'error.main' }}
+          >
+            Reject Resource
+          </MenuItem>
+        )}
+        <MenuItem 
+          onClick={handleDelete}
+          sx={{ borderRadius: 1.5, fontSize: 12, fontWeight: 800, py: 1, px: 1.5, color: 'error.main', '&:hover': { bgcolor: 'error.lighter' } }}
+        >
+          Delete Resource
+        </MenuItem>
+      </Menu>
 
       {/* Add Stock Modal */}
       <Modal 
@@ -240,7 +445,7 @@ export const LibrarianStock = () => {
               placeholder="e.g. Modern Operating Systems"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   bgcolor: 'grey.50',
                   fontWeight: 600,
                   fontSize: 14,
@@ -261,7 +466,7 @@ export const LibrarianStock = () => {
               placeholder="978-..."
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   bgcolor: 'grey.50',
                   fontWeight: 600,
                   fontSize: 14,
@@ -284,7 +489,7 @@ export const LibrarianStock = () => {
               placeholder="Condition, shelf location, or acquisition details..."
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: 1.5,
                   bgcolor: 'grey.50',
                   fontWeight: 500,
                   fontSize: 14,
@@ -298,7 +503,7 @@ export const LibrarianStock = () => {
             severity="warning" 
             icon={<WarningAmberIcon sx={{ fontSize: 20 }} />}
             sx={{ 
-              borderRadius: 3, 
+              borderRadius: 2, 
               bgcolor: 'warning.lighter', 
               color: 'warning.dark',
               border: '1px solid',
@@ -322,7 +527,7 @@ export const LibrarianStock = () => {
               py: 1.5,
               bgcolor: 'grey.900',
               color: 'white',
-              borderRadius: 3.5,
+              borderRadius: 2,
               fontWeight: 'bold',
               fontSize: 12,
               textTransform: 'uppercase',

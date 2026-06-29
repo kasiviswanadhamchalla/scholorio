@@ -1,6 +1,16 @@
 import { useRestQuery, useRestMutation } from '../../hooks/useRest';
 import React, { useState } from 'react';
 
+const parseDate = (d) => {
+  if (!d) return 'N/A';
+  if (Array.isArray(d)) {
+    const [year, month, day, hour = 0, minute = 0, second = 0] = d;
+    return new Date(year, month - 1, day, hour, minute, second).toLocaleDateString();
+  }
+  const date = new Date(d);
+  return isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
+};
+
 
 import { 
   Box, 
@@ -291,7 +301,7 @@ export const BookManagement = () => {
                   />
                 </TableCell>
                 <TableCell sx={{ fontSize: 11, color: 'text.secondary', fontWeight: 500 }}>
-                  {new Date(book.createdAt).toLocaleDateString()}
+                  {parseDate(book.createdAt)}
                 </TableCell>
                 <TableCell align="right" sx={{ pr: 4 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -336,7 +346,7 @@ export const BookManagement = () => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={handleMenuClose}
-        PaperProps={{ sx: { borderRadius: 2, mt: 0.5 } }}
+        slotProps={{ paper: { sx: { borderRadius: 2, mt: 0.5 } } }}
       >
         <MenuItem onClick={handleMenuClose} sx={{ fontSize: 12, fontWeight: 600 }}>Edit Draft</MenuItem>
         <MenuItem onClick={handleMenuClose} sx={{ fontSize: 12, fontWeight: 600, color: 'error.main' }}>Decommission</MenuItem>

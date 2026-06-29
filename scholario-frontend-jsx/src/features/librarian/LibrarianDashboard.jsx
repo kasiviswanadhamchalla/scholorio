@@ -48,8 +48,11 @@ import { CustomSelect } from '../../components/CustomSelect';
 
 
 const StatCard = ({ title, value, icon, color, bg }) => (
-  <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
-    <CardContent sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', '&:last-child': { pb: 3 } }}>
+  <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+    <CardContent sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, '&:last-child': { pb: 2.5 } }}>
+      <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: bg, color: color, display: 'flex' }}>
+        {icon}
+      </Box>
       <Box>
         <Typography variant="body2" color="text.secondary" fontWeight={500} sx={{ mb: 0.5 }}>
           {title}
@@ -57,9 +60,6 @@ const StatCard = ({ title, value, icon, color, bg }) => (
         <Typography variant="h5" fontWeight="bold" color="text.primary">
           {value}
         </Typography>
-      </Box>
-      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: bg, color: color, display: 'flex' }}>
-        {icon}
       </Box>
     </CardContent>
   </Card>
@@ -87,21 +87,22 @@ const ActionCard = ({ title, description, icon: Icon, color, onClick }) => {
       sx={{
         bgcolor: colorScheme.bg,
         color: 'white',
-        borderRadius: 4.5,
-        p: 2.5,
-        boxShadow: `0 8px 24px ${colorScheme.shadow}`,
-        textTransform: 'none',
+        borderRadius: 2,
+        p: 3.5,
         display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        justifyContent: 'flex-start',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        minHeight: 180,
+        boxShadow: 'none',
+        textAlign: 'left',
+        textTransform: 'none',
         '&:hover': {
           bgcolor: colorScheme.hover,
-          boxShadow: `0 12px 28px ${colorScheme.shadow}`,
         }
       }}
     >
-      <Box sx={{ p: 1.5, bg: 'rgba(255,255,255,0.2)', bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 2.5, display: 'flex', color: 'white' }}>
+      <Box sx={{ p: 1.5, bg: 'rgba(255,255,255,0.2)', bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 1.5, display: 'flex', color: 'white' }}>
         <Icon sx={{ fontSize: 24 }} />
       </Box>
       <Box sx={{ flexGrow: 1, textAlign: 'left' }}>
@@ -131,7 +132,37 @@ export const LibrarianDashboard = () => {
   const { loading, error, data, refetch } = useRestQuery('/api/lending/due-dates', 'getDueDates');
   const { data: membersData } = useRestQuery('/api/member/users', 'getStudentList');
   const { data: booksData } = useRestQuery('/api/catalog', 'getAllBooks');
-  const { data: statsData } = useRestQuery('/api/member/dashboard', 'getLibrarianStats');
+  const { loading: statsLoading, error: statsError, data: statsData } = useRestQuery('/api/lending/stats', 'getLibrarianStats');
+
+  const getStatValue = (key) => {
+    if (statsLoading) return "...";
+    if (statsError) return "Error";
+    return statsData?.getLibrarianStats?.[key]?.toString() || "0";
+  };
+
+  const handleExportReport = async () => {
+    try {
+      const token = window.localStorage.getItem('scholario_token') || 'mock-jwt-token-123456';
+      const response = await fetch('/api/member/reports/export', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Export failed');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'library_report.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export CSV report:', err);
+      alert('Failed to export CSV report');
+    }
+  };
 
   const handleIssue = async () => {
     if (!selectedBook || !selectedMember) return;
@@ -174,7 +205,7 @@ export const LibrarianDashboard = () => {
     const book = booksData?.getAllBooks.find((b) => b.id === issue.bookId);
     return {
       id: issue.id,
-      name: book ? `${book.title} (Due: ${new Date(issue.dueDate).toLocaleDateString()})` : `Issue #${issue.id.substring(0, 8)}`
+      name: book ? `${book.title} (Due: ${new Date(issue.dueDate).toLocaleDateString()})` : `Issue #${String(issue.id).substring(0, 8)}`
     };
   });
 
@@ -194,25 +225,27 @@ export const LibrarianDashboard = () => {
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
+            onClick={handleExportReport}
             sx={{ 
-              borderRadius: 3.5, 
-              py: 1, 
-              px: 2, 
+              borderRadius: 2, 
+              py: 1.5, 
+              px: 3, 
               fontWeight: 'bold',
+              fontSize: 12,
               textTransform: 'none',
               borderColor: 'divider',
               color: 'text.secondary',
               '&:hover': { borderColor: 'primary.main', bgcolor: 'transparent' }
             }}
           >
-            Export Logs
+            Export Report
           </Button>
           <Button 
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => navigate('/librarian/stock')}
             sx={{ 
-              borderRadius: 3.5, 
+              borderRadius: 2, 
               py: 1, 
               px: 2.5,
               bgcolor: 'grey.900',
@@ -226,30 +259,35 @@ export const LibrarianDashboard = () => {
         </Box>
       </Box>
 
-      {/* Stats row */}
+      {statsError && (
+        <Alert severity="error" sx={{ borderRadius: 2 }}>
+          Cannot fetch live statistics from the backend. Please check your connection to the lending service.
+        </Alert>
+      )}
+
       {/* Stats row */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
         <StatCard 
           title="Active Issues" 
-          value={statsData?.getLibrarianStats.activeIssues.toString() || "0"} 
+          value={getStatValue("activeIssues")} 
           color="#4f46e5" bg="#e0e7ff"
           icon={<BookIcon />} 
         />
         <StatCard 
           title="Overdue" 
-          value={statsData?.getLibrarianStats.overdueIssues.toString() || "0"} 
+          value={getStatValue("overdueIssues")} 
           color="#e11d48" bg="#ffe4e6"
           icon={<WarningAmberIcon />} 
         />
         <StatCard 
           title="Returned (Today)" 
-          value={statsData?.getLibrarianStats.returnedToday.toString() || "0"} 
+          value={getStatValue("returnedToday")} 
           color="#10b981" bg="#d1fae5"
           icon={<CheckCircleIcon />} 
         />
         <StatCard 
           title="Reservations" 
-          value={statsData?.getLibrarianStats.activeReservations.toString() || "0"} 
+          value={getStatValue("activeReservations")} 
           color="#d97706" bg="#fef3c7"
           icon={<AccessTimeIcon />} 
         />
@@ -283,7 +321,7 @@ export const LibrarianDashboard = () => {
             severity="info" 
             icon={<HistoryIcon fontSize="small" />}
             sx={{ 
-              borderRadius: 4.5, 
+              borderRadius: 2, 
               bgcolor: 'primary.lighter', 
               color: 'primary.dark',
               border: '1px solid',
@@ -292,23 +330,23 @@ export const LibrarianDashboard = () => {
               '& .MuiAlert-icon': { color: 'primary.main', display: 'flex', alignItems: 'center' }
             }}
           >
-            <Typography variant="caption" fontWeight="black" sx={{ textTransform: 'uppercase', display: 'block', mb: 0.5, letterSpacing: 0.5 }}>
-              Quick Tip
+            <Typography variant="subtitle2" fontWeight="black" sx={{ textTransform: 'uppercase', display: 'block', mb: 0.5, letterSpacing: 0.5 }}>
+              System Message
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: 13, fontWeight: 500, lineHeight: 1.45 }}>
-              Always verify the book condition before confirming a return to maintain accurate resource tracking.
+            <Typography variant="body2" sx={{ fontSize: 13, fontWeight: 500 }}>
+              Live synchronization active. Ready to process issues and returns.
             </Typography>
           </Alert>
         </Grid>
 
         {/* Live activity log */}
         <Grid xs={12} lg={8}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
             <Box sx={{ px: 3, py: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50' }}>
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <HistoryIcon color="primary" fontSize="small" /> Recent Circulation
               </Typography>
-              <Chip label="Live Log" size="small" color="primary" sx={{ fontWeight: 800, borderRadius: 2, fontSize: 10 }} />
+              <Chip label="Live Log" size="small" color="primary" sx={{ fontWeight: 800, borderRadius: 1, fontSize: 10 }} />
             </Box>
 
             <TableContainer>
@@ -351,7 +389,7 @@ export const LibrarianDashboard = () => {
                               {book?.title || `Book #${issue.bookId}`}
                             </Typography>
                             <Typography variant="caption" color="text.disabled" sx={{ display: 'block', fontSize: 10 }}>
-                              ID: {issue.id.substring(0, 8)}...
+                              ID: {String(issue.id).substring(0, 8)}...
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ fontSize: 12, color: 'text.secondary', fontWeight: 500, fontFamily: 'sans-serif' }}>
@@ -410,7 +448,7 @@ export const LibrarianDashboard = () => {
             variant="contained"
             sx={{ 
               py: 1.5, 
-              borderRadius: 3.5, 
+              borderRadius: 2, 
               bgcolor: 'primary.main', 
               color: 'white', 
               fontWeight: 'bold', 
@@ -458,7 +496,7 @@ export const LibrarianDashboard = () => {
             color="success"
             sx={{ 
               py: 1.5, 
-              borderRadius: 3.5, 
+              borderRadius: 2, 
               fontWeight: 'bold', 
               fontSize: 13,
               textTransform: 'none',

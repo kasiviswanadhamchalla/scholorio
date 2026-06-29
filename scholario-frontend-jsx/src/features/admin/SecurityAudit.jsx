@@ -95,8 +95,8 @@ export const SecurityAudit = () => {
       {/* Main Grid */}
       <Grid container spacing={4}>
         {/* Left Side: Stats and Filters */}
-        <Grid item xs={12} lg={3} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Card sx={{ borderRadius: 4, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
+        <Grid size={{ xs: 12, lg: 3 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Card sx={{ borderRadius: 2, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
               <Typography variant="caption" fontWeight="bold" sx={{ display: 'block', color: 'grey.500', textTransform: 'uppercase', letterSpacing: 1.5, mb: 3 }}>
                 Security Overview
@@ -132,7 +132,7 @@ export const SecurityAudit = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', p: 1 }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', p: 1 }}>
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
               <Typography variant="caption" fontWeight="black" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1.2, display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <FilterListIcon fontSize="small" /> Search Filters
@@ -143,16 +143,18 @@ export const SecurityAudit = () => {
                 placeholder="Search Subject..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ pl: 0.5 }}>
-                      <SearchIcon fontSize="small" />
-                    </InputAdornment>
-                  )
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start" sx={{ pl: 0.5 }}>
+                        <SearchIcon fontSize="small" />
+                      </InputAdornment>
+                    )
+                  }
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: 2.5,
+                    borderRadius: 1.5,
                     bgcolor: 'grey.50',
                     fontSize: 12,
                     fontWeight: 600,
@@ -166,8 +168,8 @@ export const SecurityAudit = () => {
         </Grid>
 
         {/* Right Side: Logs Table & Patterns */}
-        <Grid item xs={12} lg={9} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
+        <Grid size={{ xs: 12, lg: 9 }} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
             <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50' }}>
               <ShieldIcon color="error" fontSize="small" />
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -206,7 +208,7 @@ export const SecurityAudit = () => {
                           {v.username}
                         </Typography>
                         <Typography variant="caption" color="text.disabled" sx={{ fontSize: 10, display: 'block', mt: 0.25 }}>
-                          Node ID: {v.id.substring(0, 8)}
+                          Node ID: {String(v.id).substring(0, 8)}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ fontSize: 11, color: 'text.secondary', fontWeight: 'bold', textTransform: 'uppercase' }}>
@@ -272,13 +274,13 @@ export const SecurityAudit = () => {
               ) : (
                 <Grid container spacing={3}>
                   {patterns.map((p) => (
-                    <Grid item xs={12} sm={6} key={p.id}>
+                    <Grid size={{ xs: 12, sm: 6 }} key={p.id}>
                       <Box 
                         sx={{ 
                           p: 2.5, 
                           border: '1px solid', 
                           borderColor: 'grey.100', 
-                          borderRadius: 4, 
+                          borderRadius: 1.5, 
                           bgcolor: 'grey.50',
                           display: 'flex',
                           flexDirection: 'column',
@@ -325,7 +327,7 @@ export const SecurityAudit = () => {
               severity={getSeverityColor(selectedViolation.severity)}
               icon={<WarningAmberIcon sx={{ fontSize: 24 }} />}
               sx={{ 
-                borderRadius: 3.5, 
+                borderRadius: 1.5, 
                 border: '1px solid',
                 alignItems: 'flex-start',
                 '& .MuiAlert-icon': { mt: 0.5 }
@@ -340,8 +342,8 @@ export const SecurityAudit = () => {
             </Alert>
 
             <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Box sx={{ bg: 'grey.50', bgcolor: 'grey.50', p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <Grid size={{ xs: 6 }}>
+                <Box sx={{ bg: 'grey.50', bgcolor: 'grey.50', p: 2, borderRadius: 1.5, border: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                     Subject
                   </Typography>
@@ -350,8 +352,8 @@ export const SecurityAudit = () => {
                   </Typography>
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <Box sx={{ bg: 'grey.50', bgcolor: 'grey.50', p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
+              <Grid size={{ xs: 6 }}>
+                <Box sx={{ bg: 'grey.50', bgcolor: 'grey.50', p: 2, borderRadius: 1.5, border: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ textTransform: 'uppercase', display: 'block', mb: 0.5 }}>
                     Incident Type
                   </Typography>
@@ -362,7 +364,7 @@ export const SecurityAudit = () => {
               </Grid>
             </Grid>
 
-            <Box sx={{ p: 3, bgcolor: 'grey.900', color: 'white', borderRadius: 4 }}>
+            <Box sx={{ p: 3, bgcolor: 'grey.900', color: 'white', borderRadius: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, color: 'primary.light' }}>
                 <VerifiedUserIcon fontSize="small" />
                 <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>
@@ -375,7 +377,7 @@ export const SecurityAudit = () => {
                   variant="contained" 
                   color="error"
                   onClick={() => { alert('Isolating Node...'); setSelectedViolation(null); }}
-                  sx={{ py: 1.25, borderRadius: 3, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 10, letterSpacing: 1 }}
+                  sx={{ py: 1.25, borderRadius: 2, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 10, letterSpacing: 1 }}
                 >
                   Isolate Subject Node
                 </Button>
@@ -384,7 +386,7 @@ export const SecurityAudit = () => {
                   variant="contained" 
                   color="inherit"
                   onClick={() => { alert('Clearing Incident...'); setSelectedViolation(null); }}
-                  sx={{ py: 1.25, borderRadius: 3, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 10, letterSpacing: 1, bgcolor: 'grey.800', '&:hover': { bgcolor: 'grey.700' } }}
+                  sx={{ py: 1.25, borderRadius: 2, fontWeight: 'bold', textTransform: 'uppercase', fontSize: 10, letterSpacing: 1, bgcolor: 'grey.800', '&:hover': { bgcolor: 'grey.700' } }}
                 >
                   Mark as False Positive
                 </Button>
