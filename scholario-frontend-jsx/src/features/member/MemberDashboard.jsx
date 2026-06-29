@@ -88,7 +88,7 @@ export const MemberDashboard = () => {
             variant="outlined"
             startIcon={<HistoryIcon />}
             sx={{ 
-              borderRadius: 3, 
+              borderRadius: 2, 
               fontWeight: 'bold', 
               py: 1, 
               px: 2,
@@ -108,7 +108,7 @@ export const MemberDashboard = () => {
             color="success"
             startIcon={<SearchIcon />}
             sx={{ 
-              borderRadius: 3, 
+              borderRadius: 2, 
               fontWeight: 'bold', 
               py: 1, 
               px: 2.5,
@@ -122,42 +122,40 @@ export const MemberDashboard = () => {
       </Box>
 
       {/* Stats Cards */}
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
         {stats.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <Grid item xs={12} sm={6} md={3} key={idx}>
-              <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', transition: 'all 0.2s', '&:hover': { boxShadow: 2, borderColor: 'primary.lighter' } }}>
-                <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ p: 1.25, borderRadius: 3, bgcolor: stat.bg, color: stat.color, display: 'flex' }}>
-                      <Icon sx={{ fontSize: 24 }} />
-                    </Box>
+            <Card key={idx} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', transition: 'all 0.2s', '&:hover': { boxShadow: 2, borderColor: 'primary.lighter' } }}>
+              <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box sx={{ p: 1.25, borderRadius: 1.5, bgcolor: stat.bg, color: stat.color, display: 'flex' }}>
+                    <Icon sx={{ fontSize: 24 }} />
                   </Box>
-                  <Box sx={{ mt: 2.5 }}>
-                    <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>
-                      {stat.label}
-                    </Typography>
-                    <Typography variant="h4" fontWeight={900} color="text.primary" sx={{ mt: 0.5, letterSpacing: -0.5 }}>
-                      {stat.value}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Box>
+                <Box sx={{ mt: 2.5 }}>
+                  <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>
+                    {stat.label}
+                  </Typography>
+                  <Typography variant="h4" fontWeight={900} color="text.primary" sx={{ mt: 0.5, letterSpacing: -0.5 }}>
+                    {stat.value}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
           );
         })}
-      </Grid>
+      </Box>
 
       {/* Main Content Areas */}
       <Grid container spacing={4}>
-        <Grid item xs={12} lg={8}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+        <Grid xs={12} lg={8}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
             <Box sx={{ px: 3, py: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'grey.50' }}>
               <Typography variant="subtitle2" fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
                 Currently Borrowed
               </Typography>
-              <Chip label={`${booksHeld} Units`} size="small" color="primary" sx={{ fontWeight: 800, borderRadius: 2, fontSize: 10 }} />
+              <Chip label={`${booksHeld} Units`} size="small" color="primary" sx={{ fontWeight: 800, borderRadius: 1, fontSize: 10 }} />
             </Box>
             
             <Box>
@@ -197,7 +195,7 @@ export const MemberDashboard = () => {
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.100', color: 'primary.main', display: 'flex' }}>
+                      <Box sx={{ p: 1.5, borderRadius: 1.5, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.100', color: 'primary.main', display: 'flex' }}>
                         <BookIcon />
                       </Box>
                       <Box>
@@ -205,14 +203,14 @@ export const MemberDashboard = () => {
                           Resource ID: {issue.bookId}
                         </Typography>
                         <Typography variant="caption" fontWeight="bold" color="text.disabled" sx={{ fontFamily: 'monospace', textTransform: 'uppercase' }}>
-                          REF: {issue.id.substring(0, 8)}
+                          REF: {String(issue.id).substring(0, 8)}
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                           <Chip 
                             label={isOverdue ? 'Overdue' : isDueSoon ? `Due in ${diffDays}d` : 'Secured'}
                             size="small"
                             color={isOverdue ? 'error' : isDueSoon ? 'warning' : 'success'}
-                            sx={{ fontWeight: 'black', borderRadius: 1.5, fontSize: 9, height: 18 }}
+                            sx={{ fontWeight: 'black', borderRadius: 1, fontSize: 9, height: 18 }}
                           />
                           <Typography variant="caption" color="text.secondary" fontWeight={600}>
                             Due {dueDate.toLocaleDateString()}
@@ -221,10 +219,10 @@ export const MemberDashboard = () => {
                       </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
-                      <Button variant="outlined" size="small" sx={{ borderRadius: 2, textTransform: 'none', py: 0.75, px: 2, fontSize: 11, fontWeight: 'bold' }}>
+                      <Button variant="outlined" size="small" sx={{ borderRadius: 1.5, textTransform: 'none', py: 0.75, px: 2, fontSize: 11, fontWeight: 'bold' }}>
                         Renew
                       </Button>
-                      <Button variant="contained" size="small" sx={{ borderRadius: 2, textTransform: 'none', py: 0.75, px: 2, fontSize: 11, fontWeight: 'bold' }}>
+                      <Button variant="contained" size="small" sx={{ borderRadius: 1.5, textTransform: 'none', py: 0.75, px: 2, fontSize: 11, fontWeight: 'bold' }}>
                         Details
                       </Button>
                     </Box>
@@ -242,9 +240,9 @@ export const MemberDashboard = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} lg={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Grid xs={12} lg={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {/* Quick Discovery */}
-          <Card sx={{ borderRadius: 4, bgcolor: 'primary.main', color: 'white', border: 'none', p: 1 }}>
+          <Card sx={{ borderRadius: 2, bgcolor: 'primary.main', color: 'white', border: 'none', p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
               <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, tracking: -0.2 }}>
                 Quick Discovery
@@ -271,7 +269,7 @@ export const MemberDashboard = () => {
                     '& .MuiOutlinedInput-root': {
                       bgcolor: 'rgba(255,255,255,0.1)',
                       color: 'white',
-                      borderRadius: 3,
+                      borderRadius: 1.5,
                       '& fieldset': {
                         borderColor: 'rgba(255,255,255,0.2)',
                       },
@@ -296,7 +294,7 @@ export const MemberDashboard = () => {
                     bgcolor: 'white', 
                     color: 'primary.main',
                     py: 1.25,
-                    borderRadius: 3,
+                    borderRadius: 2,
                     fontWeight: 'bold',
                     fontSize: 12,
                     textTransform: 'none',
@@ -324,7 +322,7 @@ export const MemberDashboard = () => {
                           sx={{ 
                             p: 1.5, 
                             bgcolor: 'rgba(255,255,255,0.05)', 
-                            borderRadius: 2.5, 
+                            borderRadius: 1.5, 
                             border: '1px solid rgba(255,255,255,0.1)',
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -339,13 +337,13 @@ export const MemberDashboard = () => {
                               {book.isbn}
                             </Typography>
                           </Box>
-                          <Button size="small" sx={{ bgcolor: 'white', color: 'primary.main', fontSize: 9, fontWeight: 'bold', minWidth: 48, py: 0.5, borderRadius: 1.5, textTransform: 'none', '&:hover': { bgcolor: 'grey.100' } }}>
+                          <Button size="small" sx={{ bgcolor: 'white', color: 'primary.main', fontSize: 9, fontWeight: 'bold', minWidth: 48, py: 0.5, borderRadius: 1, textTransform: 'none', '&:hover': { bgcolor: 'grey.100' } }}>
                             Hold
                           </Button>
                         </Box>
                       ))}
                       {searchData.searchBooks.length === 0 && (
-                        <Typography variant="caption" sx={{ fontStyle: 'italic', color: 'rgba(255,255,255,0.6)' }}>
+                        <Typography variant="caption" sx={{ fontStyle: 'italic', color: 'rgba(255, 255, 255, 0.6)' }}>
                           No nodes matched criteria.
                         </Typography>
                       )}
@@ -357,9 +355,9 @@ export const MemberDashboard = () => {
           </Card>
 
           {/* Payments & Dues */}
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', transition: 'all 0.2s', '&:hover': { borderColor: 'success.lighter' } }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', transition: 'all 0.2s', '&:hover': { borderColor: 'success.lighter' } }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-              <Box sx={{ p: 1.25, borderRadius: 3, bgcolor: '#ecfdf5', color: '#059669', display: 'inline-flex', mb: 2 }}>
+              <Box sx={{ p: 1.25, borderRadius: 1.5, bgcolor: '#ecfdf5', color: '#059669', display: 'inline-flex', mb: 2 }}>
                 <WarningAmberIcon />
               </Box>
               <Typography variant="subtitle2" fontWeight="bold" color="text.primary">

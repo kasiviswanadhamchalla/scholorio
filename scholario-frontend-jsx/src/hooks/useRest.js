@@ -27,15 +27,17 @@ export const useRestQuery = (url, mapperKey, params = null) => {
       // Formatting to match GraphQL response shape expected by component
       let formattedData = response.data;
       if (mapperKey === 'getFacultyList') {
-        formattedData = response.data.map(u => ({ ...u, department: { name: 'Computer Science' } }));
+        formattedData = response.data.filter(u => u.roles.includes('MEMBER'));
       } else if (mapperKey === 'getStudentList') {
-        formattedData = response.data.map(u => ({ ...u, fullName: u.fullName || u.username }));
+        formattedData = response.data
+          .filter(u => u.roles.includes('MEMBER'))
+          .map(u => ({ ...u, fullName: u.fullName || u.username }));
       } else if (mapperKey === 'getLibrarianStats') {
         formattedData = {
-          activeIssues: response.data.activeIssues || 5,
-          overdueIssues: response.data.overdueIssues || 1,
-          returnedToday: response.data.returnedToday || 2,
-          activeReservations: response.data.activeReservations || 3
+          activeIssues: response.data.activeIssues ?? 0,
+          overdueIssues: response.data.overdueIssues ?? 0,
+          returnedToday: response.data.returnedToday ?? 0,
+          activeReservations: response.data.activeReservations ?? 0
         };
       }
       
@@ -44,28 +46,7 @@ export const useRestQuery = (url, mapperKey, params = null) => {
     } catch (err) {
       console.error(`Query error for ${url}:`, err);
       setError(err);
-      // set mock data fallback to avoid UI crash if service is temporarily offline
-      if (mapperKey === 'getLibrarianStats') {
-        setData({
-          getLibrarianStats: { activeIssues: 5, overdueIssues: 1, returnedToday: 2, activeReservations: 3 }
-        });
-      } else if (mapperKey === 'getViolationReports') {
-        setData({
-          getViolationReports: [
-            {
-              id: 1,
-              username: 'member_alice',
-              type: 'EXCESS_DOWNLOADS',
-              severity: 'HIGH',
-              description: 'Downloaded 20 digital assets in 5 minutes.',
-              detectedAt: new Date().toISOString(),
-              resolved: false
-            }
-          ]
-        });
-      } else {
-        setData({ [mapperKey]: [] });
-      }
+      setData({ [mapperKey]: [] });
     } finally {
       setLoading(false);
     }

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping
+@RequestMapping({"/", "", "/api", "/api/lending", "/lending"})
 @RequiredArgsConstructor
 @Slf4j
 public class LendingRestController {
@@ -164,7 +164,8 @@ public class LendingRestController {
         return Map.of(
                 "activeIssues", (int) issueService.countActive(),
                 "overdueIssues", (int) issueService.countOverdue(),
-                "returnedToday", (int) issueService.countReturnedToday()
+                "returnedToday", (int) issueService.countReturnedToday(),
+                "activeReservations", approvalService.getQueue().size()
         );
     }
 }

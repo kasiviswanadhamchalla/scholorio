@@ -47,6 +47,32 @@ export const AuthProvider = ({ children }) => {
           setToken(keycloak.token || null);
           if (keycloak.token) window.localStorage.setItem('scholario_token', keycloak.token);
           setUsername(keycloak.tokenParsed?.preferred_username || null);
+
+          // Handle automatic token refresh when expired
+          keycloak.onTokenExpired = () => {
+            keycloak.updateToken(30).then((refreshed) => {
+              if (refreshed) {
+                console.log('[Auth] Token refreshed (expired event)');
+                setToken(keycloak.token || null);
+                if (keycloak.token) window.localStorage.setItem('scholario_token', keycloak.token);
+              }
+            }).catch((err) => {
+              console.error('[Auth] Failed to refresh token (expired event):', err);
+            });
+          };
+
+          // Proactively check and refresh token every 30 seconds if it expires within 30s
+          const refreshInterval = setInterval(() => {
+            keycloak.updateToken(30).then((refreshed) => {
+              if (refreshed) {
+                console.log('[Auth] Token refreshed (proactive interval)');
+                setToken(keycloak.token || null);
+                if (keycloak.token) window.localStorage.setItem('scholario_token', keycloak.token);
+              }
+            }).catch((err) => {
+              console.warn('[Auth] Proactive token refresh failed/skipped:', err);
+            });
+          }, 30000);
           
           const keycloakRoles = keycloak.realmAccess?.roles || [];
           const functionalRoles = ['SUPER_ADMIN', 'LIBRARIAN', 'ASSISTANT_LIBRARIAN', 'MEMBER'].filter(r => keycloakRoles.includes(r));
