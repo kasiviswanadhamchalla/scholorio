@@ -146,7 +146,7 @@ export const DepartmentsManagement = () => {
             startIcon={<PersonAddIcon />}
             onClick={() => setIsLinkModalOpen(true)}
             sx={{ 
-              borderRadius: 3.5, 
+              borderRadius: 2, 
               py: 1.25, 
               px: 2.5, 
               borderColor: 'divider', 
@@ -164,7 +164,7 @@ export const DepartmentsManagement = () => {
             startIcon={<AddIcon />}
             onClick={() => setIsDeptModalOpen(true)}
             sx={{ 
-              borderRadius: 3.5, 
+              borderRadius: 2, 
               py: 1.25, 
               px: 2.5, 
               bgcolor: 'grey.900', 
@@ -184,7 +184,7 @@ export const DepartmentsManagement = () => {
       <Grid container spacing={4}>
         {/* Table of Departments */}
         <Grid item xs={12} md={8}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none', overflow: 'hidden' }}>
             <Box sx={{ px: 3, py: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50' }}>
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Building2Icon color="action" fontSize="small" /> Registered Departments
@@ -192,7 +192,7 @@ export const DepartmentsManagement = () => {
               <Chip 
                 label={`${deptData?.getDepartments.length || 0} Total`} 
                 size="small" 
-                sx={{ fontWeight: 'black', fontSize: 10, borderRadius: 2 }} 
+                sx={{ fontWeight: 'black', fontSize: 10, borderRadius: 1 }} 
               />
             </Box>
             
@@ -264,7 +264,7 @@ export const DepartmentsManagement = () => {
 
         {/* Faculty Directory Panel */}
         <Grid item xs={12} md={4}>
-          <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
             <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50' }}>
               <GroupIcon color="action" fontSize="small" />
               <Typography variant="subtitle2" fontWeight={850} sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -286,7 +286,7 @@ export const DepartmentsManagement = () => {
                         p: 2, 
                         border: '1px solid', 
                         borderColor: 'grey.100', 
-                        borderRadius: 3.5, 
+                        borderRadius: 1.5, 
                         bgcolor: 'grey.50',
                         display: 'flex',
                         flexDirection: 'column',
@@ -308,7 +308,7 @@ export const DepartmentsManagement = () => {
                             size="small" 
                             color="success" 
                             variant="outlined"
-                            sx={{ fontWeight: 'black', borderRadius: 1.5, fontSize: 8, height: 16 }} 
+                            sx={{ fontWeight: 'black', borderRadius: 1, fontSize: 8, height: 16 }} 
                           />
                         ) : (
                           <Chip 
@@ -316,7 +316,7 @@ export const DepartmentsManagement = () => {
                             size="small" 
                             color="error" 
                             variant="outlined"
-                            sx={{ fontWeight: 'black', borderRadius: 1.5, fontSize: 8, height: 16 }} 
+                            sx={{ fontWeight: 'black', borderRadius: 1, fontSize: 8, height: 16 }} 
                           />
                         )}
                       </Box>
@@ -346,7 +346,7 @@ export const DepartmentsManagement = () => {
               value={deptName}
               onChange={(e) => setDeptName(e.target.value)}
               placeholder="e.g. Physics"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14 } }}
             />
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -358,14 +358,14 @@ export const DepartmentsManagement = () => {
               value={deptCode}
               onChange={(e) => setDeptCode(e.target.value)}
               placeholder="e.g. PHY_01"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14, fontFamily: 'monospace' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14, fontFamily: 'monospace' } }}
             />
           </Box>
           <Button 
             onClick={handleCreateDept}
             disabled={!deptName || !deptCode}
             variant="contained"
-            sx={{ py: 1.5, borderRadius: 3.5, bgcolor: 'grey.900', color: 'white', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}
+            sx={{ py: 1.5, borderRadius: 2, bgcolor: 'grey.900', color: 'white', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}
           >
             Create Department
           </Button>
@@ -394,7 +394,7 @@ export const DepartmentsManagement = () => {
               value={deptName}
               onChange={(e) => setDeptName(e.target.value)}
               placeholder="e.g. Physics"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14 } }}
             />
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -406,14 +406,14 @@ export const DepartmentsManagement = () => {
               value={deptCode}
               onChange={(e) => setDeptCode(e.target.value)}
               placeholder="e.g. PHY_01"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14, fontFamily: 'monospace' } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 1.5, bgcolor: 'grey.50', fontWeight: 600, fontSize: 14, fontFamily: 'monospace' } }}
             />
           </Box>
           <Button 
             onClick={handleUpdateDept}
             disabled={!deptName || !deptCode}
             variant="contained"
-            sx={{ py: 1.5, borderRadius: 3.5, bgcolor: 'primary.main', color: 'white', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}
+            sx={{ py: 1.5, borderRadius: 2, bgcolor: 'primary.main', color: 'white', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}
           >
             Update Department
           </Button>
@@ -446,7 +446,7 @@ export const DepartmentsManagement = () => {
             onClick={handleLinkFaculty}
             disabled={!selectedFaculty || !selectedDept}
             variant="contained"
-            sx={{ py: 1.5, borderRadius: 3.5, bgcolor: 'primary.main', color: 'white', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}
+            sx={{ py: 1.5, borderRadius: 2, bgcolor: 'primary.main', color: 'white', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}
           >
             Confirm Assignment
           </Button>

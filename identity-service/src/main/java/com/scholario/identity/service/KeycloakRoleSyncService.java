@@ -102,26 +102,35 @@ public class KeycloakRoleSyncService {
             UserRepresentation userRep = users.get(0);
             UserResource userResource = usersResource.get(userRep.getId());
 
-            syncRealmRoles(realmResource, userResource, newRoles);
+            boolean realmChanged = syncRealmRoles(realmResource, userResource, newRoles);
+            boolean clientChanged = false;
 
             if (targetClientId != null && !targetClientId.isEmpty()) {
-                syncClientRoles(realmResource, userResource, newRoles);
+                clientChanged = syncClientRoles(realmResource, userResource, newRoles);
             }
 
-            if (forceLogout) {
-                log.info("Forcing logout for user {} to apply role changes immediately.", username);
-                userResource.logout();
+            if (realmChanged || clientChanged) {
+                if (forceLogout) {
+                    log.info("Forcing logout for user {} to apply role changes immediately.", username);
+                    userResource.logout();
+                }
+                log.info("Successfully synchronized roles for user {} in Keycloak.", username);
+            } else {
+                log.debug("No role changes detected for user {} in Keycloak.", username);
             }
-
-            log.info("Successfully synchronized roles for user {} in Keycloak.", username);
 
         } catch (Exception e) {
-            log.error("Failed to synchronize roles to Keycloak for user {}: {}", username, e.getMessage(), e);
+            if (e.getMessage() != null && (e.getMessage().contains("401") || e.getMessage().contains("Unauthorized"))) {
+                log.warn("Failed to synchronize roles to Keycloak for user {} due to unauthorized admin credentials (check client-secret): {}", username, e.getMessage());
+            } else {
+                log.error("Failed to synchronize roles to Keycloak for user {}: {}", username, e.getMessage(), e);
+            }
         }
     }
 
-    private void syncRealmRoles(RealmResource realmResource, UserResource userResource, Set<Role> newRoles) {
+    private boolean syncRealmRoles(RealmResource realmResource, UserResource userResource, Set<Role> newRoles) {
         List<RoleRepresentation> currentRealmRoles = userResource.roles().realmLevel().listAll();
+        boolean changed = false;
 
         List<RoleRepresentation> rolesToRemove = currentRealmRoles.stream()
                 .filter(r -> isAppRole(r.getName()))
@@ -131,9 +140,11 @@ public class KeycloakRoleSyncService {
         if (!rolesToRemove.isEmpty()) {
             userResource.roles().realmLevel().remove(rolesToRemove);
             log.debug("Removed old realm roles: {}", rolesToRemove.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+            changed = true;
         }
 
         List<RoleRepresentation> rolesToAdd = newRoles.stream()
+                .filter(nr -> currentRealmRoles.stream().noneMatch(cr -> cr.getName().equalsIgnoreCase(nr.name())))
                 .map(role -> {
                     try {
                         return realmResource.roles().get(role.name()).toRepresentation();
@@ -148,18 +159,22 @@ public class KeycloakRoleSyncService {
         if (!rolesToAdd.isEmpty()) {
             userResource.roles().realmLevel().add(rolesToAdd);
             log.debug("Added new realm roles: {}", rolesToAdd.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+            changed = true;
         }
+
+        return changed;
     }
 
-    private void syncClientRoles(RealmResource realmResource, UserResource userResource, Set<Role> newRoles) {
+    private boolean syncClientRoles(RealmResource realmResource, UserResource userResource, Set<Role> newRoles) {
         List<ClientRepresentation> clients = realmResource.clients().findByClientId(targetClientId);
         if (clients == null || clients.isEmpty()) {
             log.warn("Target client {} not found in Keycloak. Skipping client role sync.", targetClientId);
-            return;
+            return false;
         }
 
         String clientUuid = clients.get(0).getId();
         List<RoleRepresentation> currentClientRoles = userResource.roles().clientLevel(clientUuid).listAll();
+        boolean changed = false;
 
         List<RoleRepresentation> rolesToRemove = currentClientRoles.stream()
                 .filter(r -> isAppRole(r.getName()))
@@ -169,9 +184,11 @@ public class KeycloakRoleSyncService {
         if (!rolesToRemove.isEmpty()) {
             userResource.roles().clientLevel(clientUuid).remove(rolesToRemove);
             log.debug("Removed old client roles: {}", rolesToRemove.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+            changed = true;
         }
 
         List<RoleRepresentation> rolesToAdd = newRoles.stream()
+                .filter(nr -> currentClientRoles.stream().noneMatch(cc -> cc.getName().equalsIgnoreCase(nr.name())))
                 .map(role -> {
                     try {
                         return realmResource.clients().get(clientUuid).roles().get(role.name()).toRepresentation();
@@ -186,7 +203,10 @@ public class KeycloakRoleSyncService {
         if (!rolesToAdd.isEmpty()) {
             userResource.roles().clientLevel(clientUuid).add(rolesToAdd);
             log.debug("Added new client roles: {}", rolesToAdd.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+            changed = true;
         }
+
+        return changed;
     }
 
     private boolean isAppRole(String roleName) {
@@ -196,5 +216,54 @@ public class KeycloakRoleSyncService {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public UserRepresentation getUserFromKeycloak(String username) {
+        if (!keycloakEnabled || keycloak == null) {
+            return null;
+        }
+        try {
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            List<UserRepresentation> users = usersResource.search(username, true);
+            if (users != null && !users.isEmpty()) {
+                return users.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Failed to query user {} from Keycloak: {}", username, e.getMessage());
+        }
+        return null;
+    }
+
+    public List<String> getUserRolesFromKeycloak(String username, String keycloakUserId) {
+        if (!keycloakEnabled || keycloak == null) {
+            return Collections.emptyList();
+        }
+        try {
+            RealmResource realmResource = keycloak.realm(realm);
+            UserResource userResource = realmResource.users().get(keycloakUserId);
+            
+            java.util.Set<String> allRoles = new java.util.HashSet<>();
+            
+            List<RoleRepresentation> realmRoles = userResource.roles().realmLevel().listAll();
+            if (realmRoles != null) {
+                realmRoles.forEach(r -> allRoles.add(r.getName()));
+            }
+            
+            if (targetClientId != null && !targetClientId.isEmpty()) {
+                List<ClientRepresentation> clients = realmResource.clients().findByClientId(targetClientId);
+                if (clients != null && !clients.isEmpty()) {
+                    String clientUuid = clients.get(0).getId();
+                    List<RoleRepresentation> clientRoles = userResource.roles().clientLevel(clientUuid).listAll();
+                    if (clientRoles != null) {
+                        clientRoles.forEach(r -> allRoles.add(r.getName()));
+                    }
+                }
+            }
+            return allRoles.stream().toList();
+        } catch (Exception e) {
+            log.error("Failed to query roles for user {} from Keycloak: {}", username, e.getMessage());
+        }
+        return Collections.emptyList();
     }
 }

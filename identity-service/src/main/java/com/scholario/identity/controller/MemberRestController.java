@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping
+@RequestMapping({"/", "", "/api", "/api/member", "/member"})
 @RequiredArgsConstructor
 @Slf4j
 public class MemberRestController {

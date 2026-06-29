@@ -22,6 +22,18 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/scholario}
 
+# Keycloak properties configuration
+scholario:
+  security:
+    keycloak:
+      enabled: ${KEYCLOAK_ENABLED:true}
+  keycloak:
+    admin:
+      server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
+      realm: ${KEYCLOAK_REALM:scholario}
+      client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:scholario-backend}
+      client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET:ttrkyV13tMq4jaWGiDvqnloAN9uwgadG}
+
 auth:
   jwt:
     secret: "scholario-secret-key-2026-very-secure"

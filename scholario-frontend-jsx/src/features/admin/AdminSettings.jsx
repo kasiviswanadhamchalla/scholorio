@@ -82,8 +82,8 @@ export const AdminSettings = () => {
 
       <Grid container spacing={4}>
         {/* Left Side Info Cards */}
-        <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', textAlign: 'center', p: 1 }}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', textAlign: 'center', p: 1 }}>
             <CardContent sx={{ py: 4 }}>
               <Avatar 
                 sx={{ 
@@ -118,7 +118,7 @@ export const AdminSettings = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ borderRadius: 5, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
+          <Card sx={{ borderRadius: 2, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, color: 'grey.400' }}>
                 <ShieldIcon fontSize="small" />
@@ -150,9 +150,9 @@ export const AdminSettings = () => {
         </Grid>
 
         {/* Right Side Settings Form */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Box component="form" onSubmit={handleUpdate} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+            <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
               <Box sx={{ px: 3, py: 2.5, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'grey.50' }}>
                 <SettingsIcon color="action" />
                 <Typography variant="subtitle2" fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -176,7 +176,7 @@ export const AdminSettings = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 3.5,
+                        borderRadius: 1.5,
                         bgcolor: 'grey.50',
                         fontWeight: 600,
                         fontSize: 14,
@@ -205,7 +205,7 @@ export const AdminSettings = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 3.5,
+                        borderRadius: 1.5,
                         bgcolor: 'grey.50',
                         fontWeight: 600,
                         fontSize: 14,
@@ -242,7 +242,7 @@ export const AdminSettings = () => {
                     disabled={updating}
                     startIcon={updating ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
                     sx={{ 
-                      borderRadius: 3.5, 
+                      borderRadius: 2, 
                       textTransform: 'uppercase', 
                       fontWeight: 'bold', 
                       fontSize: 11, 
@@ -261,7 +261,7 @@ export const AdminSettings = () => {
             </Card>
 
             {/* Danger Zone */}
-            <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'error.light', bgcolor: '#fffbfb', boxShadow: 'none' }}>
+            {/* <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'error.light', bgcolor: '#fffbfb', boxShadow: 'none' }}>
               <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Typography variant="subtitle2" fontWeight="bold" color="error.dark" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <ShieldIcon /> Danger Zone
@@ -269,11 +269,11 @@ export const AdminSettings = () => {
                 <Typography variant="body2" color="error.dark" fontWeight={500}>
                   Requesting node decommissioning or identity revocation requires level 5 authorization.
                 </Typography>
-                <Button variant="contained" color="error" sx={{ alignSelf: 'flex-start', borderRadius: 3, textTransform: 'uppercase', fontWeight: 800, fontSize: 10, letterSpacing: 1, py: 1.25, px: 3, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}>
+                <Button variant="contained" color="error" sx={{ alignSelf: 'flex-start', borderRadius: 2, textTransform: 'uppercase', fontWeight: 800, fontSize: 10, letterSpacing: 1, py: 1.25, px: 3, boxShadow: 'none', '&:hover': { boxShadow: 'none' } }}>
                   Request Decommission
                 </Button>
               </CardContent>
-            </Card>
+            </Card> */}
           </Box>
         </Grid>
       </Grid>

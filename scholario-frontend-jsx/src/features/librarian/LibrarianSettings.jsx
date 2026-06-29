@@ -83,8 +83,8 @@ export const LibrarianSettings = () => {
 
       <Grid container spacing={4}>
         {/* Left Side Info Cards */}
-        <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', textAlign: 'center', p: 1 }}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', textAlign: 'center', p: 1 }}>
             <CardContent sx={{ py: 4 }}>
               <Avatar 
                 sx={{ 
@@ -115,7 +115,7 @@ export const LibrarianSettings = () => {
             </CardContent>
           </Card>
 
-          <Card sx={{ borderRadius: 5, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
+          <Card sx={{ borderRadius: 2, bgcolor: 'grey.900', color: 'white', border: 'none', p: 1 }}>
             <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, color: 'grey.400' }}>
                 <ShieldIcon fontSize="small" />
@@ -147,9 +147,9 @@ export const LibrarianSettings = () => {
         </Grid>
 
         {/* Right Side Settings Form */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Box component="form" onSubmit={handleUpdate} sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
+            <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none' }}>
               <Box sx={{ px: 3, py: 2.5, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'grey.50' }}>
                 <SettingsIcon color="success" />
                 <Typography variant="subtitle2" fontWeight={800} sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -173,7 +173,7 @@ export const LibrarianSettings = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 3.5,
+                        borderRadius: 1.5,
                         bgcolor: 'grey.50',
                         fontWeight: 600,
                         fontSize: 14,
@@ -202,7 +202,7 @@ export const LibrarianSettings = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 3.5,
+                        borderRadius: 1.5,
                         bgcolor: 'grey.50',
                         fontWeight: 600,
                         fontSize: 14,
@@ -240,7 +240,7 @@ export const LibrarianSettings = () => {
                     disabled={updating}
                     startIcon={updating ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
                     sx={{ 
-                      borderRadius: 3.5, 
+                      borderRadius: 2, 
                       textTransform: 'uppercase', 
                       fontWeight: 'bold', 
                       fontSize: 11, 
@@ -257,7 +257,7 @@ export const LibrarianSettings = () => {
             </Card>
 
             {/* Security Box */}
-            <Card sx={{ borderRadius: 5, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', transition: 'all 0.2s', '&:hover': { borderColor: 'success.lighter' } }}>
+            <Card sx={{ borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: 'none', transition: 'all 0.2s', '&:hover': { borderColor: 'success.lighter' } }}>
               <CardContent sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 3 }}>
                 <Box>
                   <Typography variant="subtitle2" fontWeight="bold" color="text.primary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -267,7 +267,7 @@ export const LibrarianSettings = () => {
                     Reset your secure access pin and circulation credentials.
                   </Typography>
                 </Box>
-                <Button variant="outlined" color="success" sx={{ borderRadius: 3, textTransform: 'uppercase', fontWeight: 800, fontSize: 10, letterSpacing: 1, py: 1.25, px: 3, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'success.main', bgcolor: 'transparent' } }}>
+                <Button variant="outlined" color="success" sx={{ borderRadius: 2, textTransform: 'uppercase', fontWeight: 800, fontSize: 10, letterSpacing: 1, py: 1.25, px: 3, borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'success.main', bgcolor: 'transparent' } }}>
                   Reset Access
                 </Button>
               </CardContent>
