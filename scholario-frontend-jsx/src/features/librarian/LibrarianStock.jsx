@@ -68,7 +68,7 @@ export const LibrarianStock = () => {
   const [createBook, { loading: creating }] = useRestMutation('/api/catalog', 'POST', 'createBook');
   const [publishBook] = useRestMutation((v) => `/api/catalog/${v.id}/publish`, 'POST', 'publishBook');
   const [archiveBook] = useRestMutation((v) => `/api/catalog/${v.id}/archive`, 'POST', 'archiveBook');
-  const [submitForReview] = useRestMutation((v) => `/api/catalog/${v.id}/submit-review`, 'POST', 'submitForReview');
+  const [submitForReview] = useRestMutation((v) => `/api/approval/submit?bookId=${v.id}`, 'POST', 'submitForReview');
   const [deleteBook] = useRestMutation((v) => `/api/catalog/${v.id}`, 'DELETE', 'deleteBook');
 
   const handleOpenMenu = async (event, book) => {

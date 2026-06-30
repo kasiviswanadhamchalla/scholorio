@@ -97,7 +97,8 @@ public class SecurityConfig {
                         "/graphiql/**",
                         "/favicon.ico",
                         "/graphql/**",
-                        "/graphql"
+                        "/graphql",
+                        "/internal/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             );
