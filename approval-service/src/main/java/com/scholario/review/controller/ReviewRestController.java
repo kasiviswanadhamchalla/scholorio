@@ -6,6 +6,7 @@ import com.scholario.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,21 +19,25 @@ public class ReviewRestController {
     private final ReviewService reviewService;
 
     @PostMapping("/submit")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'LIBRARIAN', 'ASSISTANT_LIBRARIAN', 'MEMBER')")
     public ResponseEntity<ReviewRecord> submitBookForReview(@RequestParam Long bookId, @RequestParam(required = false) Long reviewerId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.submitBookForReview(bookId, reviewerId));
     }
 
     @PostMapping("/{requestId}/approve")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'LIBRARIAN', 'ASSISTANT_LIBRARIAN')")
     public ResponseEntity<ReviewRecord> approveBook(@PathVariable Long requestId, @RequestParam(required = false) String feedback) {
         return ResponseEntity.ok(reviewService.approveBook(requestId, feedback));
     }
 
     @PostMapping("/{requestId}/reject")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'LIBRARIAN', 'ASSISTANT_LIBRARIAN')")
     public ResponseEntity<ReviewRecord> rejectBook(@PathVariable Long requestId, @RequestParam String feedback) {
         return ResponseEntity.ok(reviewService.rejectBook(requestId, feedback));
     }
 
     @PostMapping("/{requestId}/changes")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'LIBRARIAN', 'ASSISTANT_LIBRARIAN')")
     public ResponseEntity<ReviewRecord> requestChanges(@PathVariable Long requestId, @RequestParam String feedback) {
         return ResponseEntity.ok(reviewService.requestChanges(requestId, feedback));
     }
