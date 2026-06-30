@@ -41,7 +41,7 @@ const parseDate = (d) => {
 };
 
 const getHeaders = () => {
-  const token = window.localStorage.getItem('scholario_token');
+  const token = window.localStorage.getItem('scholario_token') || 'mock-jwt-token-123456';
   return {
     'Content-Type': 'application/json',
     'Authorization': token ? `Bearer ${token}` : '',
