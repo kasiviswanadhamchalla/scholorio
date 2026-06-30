@@ -87,7 +87,7 @@ export const BookManagement = () => {
   const { data: facultyListData } = useRestQuery('/api/member/users', 'getFacultyList');
   const { data: deptData, loading: deptLoading } = useRestQuery('/api/member/departments', 'getDepartments');
 
-  const [submitForReview] = useRestMutation((v) => `/api/catalog/${v.bookId}/submit-review`, 'POST', 'submitBookForReview');
+  const [submitForReview] = useRestMutation((v) => `/api/approval/submit?bookId=${v.bookId}&reviewerId=${v.reviewerId || ''}`, 'POST', 'submitBookForReview');
   const [publishBook] = useRestMutation((v) => `/api/catalog/${v.id}/publish`, 'POST', 'publishBook');
   const [createBook] = useRestMutation('/api/catalog', 'POST', 'createBook');
 
