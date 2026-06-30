@@ -2,10 +2,14 @@ package com.scholario.review.service;
 
 import com.scholario.review.client.BookServiceClient;
 import com.scholario.review.client.IdentityServiceClient;
+import com.scholario.review.client.UserDto;
 import com.scholario.review.event.ReviewEventProducer;
 import com.scholario.review.model.*;
 import com.scholario.review.repository.ReviewHistoryRepository;
 import com.scholario.review.repository.ReviewRecordRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,33 @@ public class ReviewService {
         this.bookServiceClient = bookServiceClient;
         this.identityServiceClient = identityServiceClient;
         this.reviewEventProducer = reviewEventProducer;
+    }
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        String username = null;
+        if (principal instanceof Jwt jwt) {
+            username = jwt.getClaimAsString("preferred_username");
+        } else if (principal instanceof String s) {
+            username = s;
+        } else {
+            username = authentication.getName();
+        }
+        if (username != null) {
+            try {
+                UserDto user = identityServiceClient.getUserByUsername(username);
+                if (user != null) {
+                    return user.id();
+                }
+            } catch (Exception e) {
+                // Ignore exception to keep fallback
+            }
+        }
+        return null;
     }
 
     @Transactional
@@ -69,6 +100,11 @@ public class ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException(REVIEW_RECORD_NOT_FOUND));
         validatePending(record);
 
+        Long currentUserId = getCurrentUserId();
+        if (currentUserId != null) {
+            record.setReviewerId(currentUserId);
+        }
+
         // 1. Update Review Record
         record.setStatus(new Approved());
         record.setFeedback(feedback);
@@ -78,10 +114,10 @@ public class ReviewService {
         bookServiceClient.publishBook(record.getBookId());
 
         // 3. Add to History
-        addHistory(savedRecord, new Approved(), feedback, record.getReviewerId());
+        addHistory(savedRecord, new Approved(), feedback, currentUserId != null ? currentUserId : record.getReviewerId());
 
         // 4. Publish Event
-        reviewEventProducer.publishReviewEvent("BOOK_APPROVED", savedRecord.getId(), savedRecord.getBookId(), savedRecord.getReviewerId(), "APPROVED", feedback);
+        reviewEventProducer.publishReviewEvent("BOOK_APPROVED", savedRecord.getId(), savedRecord.getBookId(), currentUserId != null ? currentUserId : record.getReviewerId(), "APPROVED", feedback);
 
         return savedRecord;
     }
@@ -93,6 +129,11 @@ public class ReviewService {
         validatePending(reviewRecord);
         validateFeedback(feedback);
 
+        Long currentUserId = getCurrentUserId();
+        if (currentUserId != null) {
+            reviewRecord.setReviewerId(currentUserId);
+        }
+
         reviewRecord.setStatus(new Rejected());
         reviewRecord.setFeedback(feedback);
         ReviewRecord savedRecord = reviewRecordRepository.save(reviewRecord);
@@ -100,10 +141,10 @@ public class ReviewService {
         // Final rejection leads to archiving via Feign client
         bookServiceClient.archiveBook(reviewRecord.getBookId());
 
-        addHistory(savedRecord, new Rejected(), feedback, reviewRecord.getReviewerId());
+        addHistory(savedRecord, new Rejected(), feedback, currentUserId != null ? currentUserId : reviewRecord.getReviewerId());
 
         // Publish Event
-        reviewEventProducer.publishReviewEvent("BOOK_REJECTED", savedRecord.getId(), savedRecord.getBookId(), savedRecord.getReviewerId(), "REJECTED", feedback);
+        reviewEventProducer.publishReviewEvent("BOOK_REJECTED", savedRecord.getId(), savedRecord.getBookId(), currentUserId != null ? currentUserId : reviewRecord.getReviewerId(), "REJECTED", feedback);
 
         return savedRecord;
     }
@@ -115,6 +156,11 @@ public class ReviewService {
         validatePending(reviewRecord);
         validateFeedback(feedback);
 
+        Long currentUserId = getCurrentUserId();
+        if (currentUserId != null) {
+            reviewRecord.setReviewerId(currentUserId);
+        }
+
         reviewRecord.setStatus(new ChangesRequested());
         reviewRecord.setFeedback(feedback);
         ReviewRecord savedRecord = reviewRecordRepository.save(reviewRecord);
@@ -122,10 +168,10 @@ public class ReviewService {
         // Transition Book back to DRAFT via Feign client
         bookServiceClient.resetToDraft(reviewRecord.getBookId());
 
-        addHistory(savedRecord, new ChangesRequested(), feedback, reviewRecord.getReviewerId());
+        addHistory(savedRecord, new ChangesRequested(), feedback, currentUserId != null ? currentUserId : reviewRecord.getReviewerId());
 
         // Publish Event
-        reviewEventProducer.publishReviewEvent("BOOK_CHANGES_REQUESTED", savedRecord.getId(), savedRecord.getBookId(), savedRecord.getReviewerId(), "CHANGES_REQUESTED", feedback);
+        reviewEventProducer.publishReviewEvent("BOOK_CHANGES_REQUESTED", savedRecord.getId(), savedRecord.getBookId(), currentUserId != null ? currentUserId : reviewRecord.getReviewerId(), "CHANGES_REQUESTED", feedback);
 
         return savedRecord;
     }

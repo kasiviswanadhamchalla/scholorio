@@ -61,6 +61,7 @@ const FacultyPortal = () => {
 const AdminPortal = () => {
   const navItems = [
     { icon: DashboardIcon, label: 'Dashboard', to: '/admin/dashboard' },
+    { icon: BookIcon, label: 'Manage Stock', to: '/admin/stock' },
     { icon: SecurityIcon, label: 'Security', to: '/admin/security' },
     { icon: BusinessIcon, label: 'Departments', to: '/admin/departments' },
     { icon: SettingsIcon, label: 'Settings', to: '/admin/settings' },
@@ -107,6 +108,7 @@ function App() {
           <Route path="/admin" element={<AdminPortal />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="stock" element={<LibrarianStock />} />
             <Route path="security" element={<SecurityAudit />} />
             <Route path="departments" element={<DepartmentsManagement />} />
             <Route path="settings" element={<AdminSettings />} />
